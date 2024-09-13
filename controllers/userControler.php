@@ -9,17 +9,17 @@ class UserController {
     public function __construct() {
         $database = new Database();
         $this->db = $database->getConnection();
-        $this->user = new User($this->db);
+        $this->user = new User(conn: $this->db);
     }
 
-    public function readUsers() {
+    public function readUsers(): void {
         $stmt = $this->user->readUsers();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($users);
+        echo json_encode(value: $users);
     }
 
-    public function createUser($data) {
-        $this->user->username = $data['User'];
+    public function createUser($data): void {
+        $this->user->user = $data['User'];  
         $this->user->password = $data['Password'];
         $this->user->description = $data['Description'];
         $this->user->picture = $data['Picture'];
@@ -27,14 +27,15 @@ class UserController {
         $this->user->name = $data['Name'];
 
         if($this->user->createUser()) {
-            echo json_encode(["message" => "Usuario creado correctamente."]);
+            echo json_encode(value: ["message" => "Usuario creado correctamente."]);
         } else {
-            echo json_encode(["message" => "Error al crear usuario."]);
+            echo json_encode(value: ["message" => "Error al crear usuario."]);
         }
     }
 
-    public function updateUser($data) {
-        $this->user->username = $data['User'];
+    public function updateUser($data): void {
+        $this->user->idUser = $data['IdUser'];  
+        $this->user->user = $data['User'];  
         $this->user->password = $data['Password'];
         $this->user->description = $data['Description'];
         $this->user->picture = $data['Picture'];
@@ -42,20 +43,19 @@ class UserController {
         $this->user->name = $data['Name'];
 
         if($this->user->updateUser()) {
-            echo json_encode(["message" => "Usuario actualizado correctamente."]);
+            echo json_encode(value: ["message" => "Usuario actualizado correctamente."]);
         } else {
-            echo json_encode(["message" => "Error al actualizar usuario."]);
+            echo json_encode(value: ["message" => "Error al actualizar usuario."]);
         }
     }
 
-    public function deleteUser($id) {
+    public function deleteUser($id): void {
         $this->user->idUser = $id;
 
         if($this->user->deleteUser()) {
-            echo json_encode(["message" => "Usuario eliminado correctamente."]);
+            echo json_encode(value: ["message" => "Usuario eliminado correctamente."]);
         } else {
-            echo json_encode(["message" => "Error al eliminar usuario."]);
+            echo json_encode(value: ["message" => "Error al eliminar usuario."]);
         }
     }
 }
-?>
