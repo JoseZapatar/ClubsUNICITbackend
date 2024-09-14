@@ -1,18 +1,18 @@
 <?php
 class Database {
     private $host = "sql3.freesqldatabase.com";
-    private $db_name = "sql3729814";
-    private $username = "sql3729814";
-    private $password = "c737KhBII";
+    private $db_name = "sql3731406";
+    private $username = "sql3731406";
+    private $password = "CRe5asLEWP";
     private $conn;
 
     // Conectar a la base de datos
-    public function getConnection() {
+    public function getConnection(): PDO {
         $this->conn = null;
 
         try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->conn = new PDO(dsn: "mysql:host=" . $this->host . ";dbname=" . $this->db_name, username: $this->username, password: $this->password);
+            $this->conn->setAttribute(attribute: PDO::ATTR_ERRMODE, value: PDO::ERRMODE_EXCEPTION);
             echo"Conectado correctamente";
         } catch (PDOException $exception) {
             echo "Error de conexión: " . $exception->getMessage();
