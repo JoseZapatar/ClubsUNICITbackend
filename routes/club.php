@@ -1,6 +1,6 @@
 <?php
 
-include_once '../controllers/ClubControler.php';
+include_once '../controllers/clubControler.php';
 
 $controller = new ClubControler();
 

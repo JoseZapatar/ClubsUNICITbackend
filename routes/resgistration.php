@@ -1,5 +1,5 @@
 <?php
-include_once '../controllers/RegistrationControler.php';
+include_once '../controllers/registrationControler.php';
 
 $controller = new RegistrationControler();
 
