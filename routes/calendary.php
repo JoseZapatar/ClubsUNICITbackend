@@ -1,13 +1,14 @@
 <?php
-include_once '../controllers/calendaryController.php';
 
-$controller = new CalendaryController();
+include_once '../controllers/calendaryControler.php';
 
-// Analizar el cuerpo de la solicitud JSON para los métodos POST, PUT y DELETE
+$controller = new CalendaryControler();
+
+$method = $_SERVER['REQUEST_METHOD'];
+
 $data = json_decode(json: file_get_contents(filename: "php://input"), associative: true);
 
-// Definir las rutas específicas para las operaciones CRUD
-switch ($_SERVER['REQUEST_METHOD']) {
+switch ($method) {
     case 'GET':
         $controller->readCalendaries();
         break;
@@ -18,16 +19,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $controller->updateCalendary(data: $data);
         break;
     case 'DELETE':
-        // Asegúrate de que el ID esté presente para borrar el calendario
-        if (!empty($data['IdCalendary'])) {
-            $controller->deleteCalendary(id: $data['IdCalendary']);
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $controller->deleteCalendary(id: $id);
         } else {
-            echo json_encode(value: ["message" => "ID del calendario es necesario para eliminar."]);
+            echo json_encode(value: ["message" => "ID no proporcionado para eliminar."]);
         }
         break;
     default:
-        http_response_code(response_code: 405);
-        echo json_encode(value: ["message" => "Método no permitido"]);
+        echo json_encode(value: ["message" => "Método no soportado."]);
         break;
 }
-?>

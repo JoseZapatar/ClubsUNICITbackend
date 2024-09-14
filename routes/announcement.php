@@ -1,6 +1,6 @@
 <?php
 
-include_once '../controllers/AnnouncementControler.php';
+include_once '../controllers/announcementControler.php';
 
 $controller = new AnnouncementControler();
 
