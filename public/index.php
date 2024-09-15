@@ -16,13 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 
-include_once '../controllers/userControler.php';
-include_once '../controllers/rolControler.php';
-include_once '../controllers/clubControler.php';
-include_once '../controllers/announcementControler.php';
-include_once '../controllers/registrationControler.php';
-include_once '../controllers/activitiesControler.php';
-include_once '../controllers/calendaryControler.php';
+// Dinamicamente include todos los archivos
+define('DIR_FILE', __FILE__);
+$controllerFiles = glob(DIR_FILE . 'controllers/*.php');
+$configFiles = glob(DIR_FILE . 'config/*.php');
+$modelsFiles = glob(DIR_FILE . 'models/*.php');
+$routeslFiles = glob(DIR_FILE . 'routes/*.php');
+$allFiles = array_merge($controllerFiles, $configFiles, $modelsFiles, $routeslFiles);
+foreach ($allFiles as $filename) {
+	include_once ($filename);
+}
 
 // Obtenemos la URI y los datos del cuerpo de la solicitud
 $request = $_SERVER['REQUEST_URI'];
