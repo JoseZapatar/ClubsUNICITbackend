@@ -25,7 +25,7 @@ class UserControler {
     public function createUser($data): void {
         $this->user->user = $data['User'];  
         $this->user->password = $data['Password'];
-        $this->user->email = $data['Description'];
+        $this->user->email = $data['Email'];
         $this->user->picture = $data['Picture'];
         $this->user->idRol = $data['IdRol'];
 
