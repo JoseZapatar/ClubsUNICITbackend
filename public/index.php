@@ -1,8 +1,13 @@
 <?php
 // Habilitar CORS
-header(header: "Access-Control-Allow-Origin: *");
-header(header: "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header(header: "Access-Control-Allow-Headers: Content-Type, Authorization");
+header('Access-Control-Allow-Origin: localhost:3000');
+header("Access-Control-Allow-Headers");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+header("Allow: GET, POST, OPTIONS, PUT, DELETE");
+$method = $_SERVER['REQUEST_METHOD'];
+if($method == "OPTIONS") {
+    die();
+}
 
 // Verificar si es una solicitud de OPTIONS (preflight request) y devolver una respuesta vacía.
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
@@ -24,7 +29,7 @@ $request = $_SERVER['REQUEST_URI'];
 $data = json_decode(json: file_get_contents(filename: "php://input"), associative: true);
 
 switch ($request) {
-    case '/CLUBSUNICITBACKEND/public/index.php/user':
+    case "'/User'":
         $userController = new UserController();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':

@@ -1,6 +1,10 @@
 <?php
 include_once '../config/database.php';
 include_once '../models/User.php';
+// Habilitar CORS
+header(header: "Access-Control-Allow-Origin: *");
+header(header: "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header(header: "Access-Control-Allow-Headers: Content-Type, Authorization");
 
 class UserController {
     private $db;
