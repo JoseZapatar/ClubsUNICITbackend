@@ -6,7 +6,7 @@ header(header: "Access-Control-Allow-Origin: *");
 header(header: "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header(header: "Access-Control-Allow-Headers: Content-Type, Authorization");
 
-class UserController {
+class UserControler {
     private $db;
     private $user;
 
@@ -25,10 +25,9 @@ class UserController {
     public function createUser($data): void {
         $this->user->user = $data['User'];  
         $this->user->password = $data['Password'];
-        $this->user->description = $data['Description'];
+        $this->user->email = $data['Description'];
         $this->user->picture = $data['Picture'];
         $this->user->idRol = $data['IdRol'];
-        $this->user->name = $data['Name'];
 
         if($this->user->createUser()) {
             echo json_encode(value: ["message" => "Usuario creado correctamente."]);
@@ -41,10 +40,9 @@ class UserController {
         $this->user->idUser = $data['IdUser'];  
         $this->user->user = $data['User'];  
         $this->user->password = $data['Password'];
-        $this->user->description = $data['Description'];
+        $this->user->email = $data['Email'];
         $this->user->picture = $data['Picture'];
         $this->user->idRol = $data['IdRol'];
-        $this->user->name = $data['Name'];
 
         if($this->user->updateUser()) {
             echo json_encode(value: ["message" => "Usuario actualizado correctamente."]);

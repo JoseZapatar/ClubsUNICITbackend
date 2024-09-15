@@ -4,10 +4,13 @@ class Club {
     public $idClub;
     public $picture;
     public $description;
+    public $banner;
+    public $clubName;
+    public $coach;
     public $idAnnouncement;
     public $idActivities;
-    public $banner;
-    public $tutor;
+    
+    
 
     public function __construct($conn) {
         $this->conn = $conn;
@@ -21,28 +24,30 @@ class Club {
     }
 
     public function createClub(): mixed {
-        $sql = "INSERT INTO club (Picture, Description, IdAnnouncement, IdActivities, Banner, Tutor)  
-                VALUES (:picture, :description, :idAnnouncement, :idActivities, :banner, :tutor)";
+        $sql = "INSERT INTO club (Picture, Description, Banner, ClubName, Coach, IdAnnouncement, IdActivities)  
+                VALUES (:picture, :description, :banner, :clubName, :coach, :idAnnouncement, :idActivities)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':picture', $this->picture);
         $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':banner', $this->banner);
+        $stmt->bindParam('clubName', $this->clubName);
+        $stmt->bindParam(':coach', $this->coach);
         $stmt->bindParam(':idAnnouncement', $this->idAnnouncement, PDO::PARAM_INT);
         $stmt->bindParam(':idActivities', $this->idActivities, PDO::PARAM_INT);
-        $stmt->bindParam(':banner', $this->banner);
-        $stmt->bindParam(':tutor', $this->tutor);
         return $stmt->execute();
     }
 
     public function updateClub(): mixed {
-        $sql = "UPDATE club SET Picture = :picture, Description = :description, IdAnnouncement = :idAnnouncement,  // Cambiado a 'club'
-                IdActivities = :idActivities, Banner = :banner, Tutor = :tutor WHERE IdClub = :idClub";
+        $sql = "UPDATE club SET Picture = :picture, Description = :description, Banner = :banner, ClubName = :clubName, Coach = :coach, IdAnnouncement = :idAnnouncement, 
+        IdActivities = :idActivities WHERE IdClub = :idClub";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':picture', $this->picture);
         $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':banner', $this->banner);
+        $stmt->bindParam('clubName', $this->clubName);
+        $stmt->bindParam(':coach', $this->coach);
         $stmt->bindParam(':idAnnouncement', $this->idAnnouncement, PDO::PARAM_INT);
         $stmt->bindParam(':idActivities', $this->idActivities, PDO::PARAM_INT);
-        $stmt->bindParam(':banner', $this->banner);
-        $stmt->bindParam(':tutor', $this->tutor);
         $stmt->bindParam(':idClub', $this->idClub, PDO::PARAM_INT);
         return $stmt->execute();
     }
