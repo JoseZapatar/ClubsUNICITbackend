@@ -5,7 +5,7 @@ header("Access-Control-Allow-Headers");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 header("Allow: GET, POST, OPTIONS, PUT, DELETE");
 $method = $_SERVER['REQUEST_METHOD'];
-if($method == "OPTIONS") {
+if ($method == "OPTIONS") {
     die();
 }
 
@@ -29,8 +29,8 @@ $request = $_SERVER['REQUEST_URI'];
 $data = json_decode(json: file_get_contents(filename: "php://input"), associative: true);
 
 switch ($request) {
-    case "'/User'":
-        $userController = new UserController();
+    case '/user':
+        $userController = new UserControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 $userController->readUsers();
