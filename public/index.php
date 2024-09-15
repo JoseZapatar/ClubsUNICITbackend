@@ -17,14 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 
 // Dinamicamente include todos los archivos
-define('DIR_FILE', __FILE__);
-$controllerFiles = glob(DIR_FILE . 'controllers/*.php');
-$configFiles = glob(DIR_FILE . 'config/*.php');
-$modelsFiles = glob(DIR_FILE . 'models/*.php');
-$routeslFiles = glob(DIR_FILE . 'routes/*.php');
-$allFiles = array_merge($controllerFiles, $configFiles, $modelsFiles, $routeslFiles);
+define('DIR_BASE', dirname(__FILE__));
+$controllerFiles = glob(DIR_BASE . '/controllers/*.php');
+$configFiles = glob(DIR_BASE . '/config/*.php');
+$modelsFiles = glob(DIR_BASE . '/models/*.php');
+$routesFiles = glob(DIR_BASE . '/routes/*.php');
+$allFiles = array_merge($controllerFiles, $configFiles, $modelsFiles, $routesFiles);
+
 foreach ($allFiles as $filename) {
-	include_once ($filename);
+    include_once($filename);
 }
 
 // Obtenemos la URI y los datos del cuerpo de la solicitud
