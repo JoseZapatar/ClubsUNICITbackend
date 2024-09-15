@@ -1,11 +1,11 @@
 <?php
-include_once '../controllers/userController.php';
-include_once '../controllers/rolController.php';
-include_once '../controllers/clubController.php';
-include_once '../controllers/announcementController.php';
-include_once '../controllers/registrationController.php';
-include_once '../controllers/activitiesController.php';
-include_once '../controllers/calendaryController.php';
+include_once '../controllers/userControler.php';
+include_once '../controllers/rolControler.php';
+include_once '../controllers/clubControler.php';
+include_once '../controllers/announcementControler.php';
+include_once '../controllers/registrationControler.php';
+include_once '../controllers/activitiesControler.php';
+include_once '../controllers/calendaryControler.php';
 
 $request = $_SERVER['REQUEST_URI'];
 $data = json_decode(json: file_get_contents(filename: "php://input"), associative: true);
