@@ -2,7 +2,7 @@
 include_once '../config/database.php';
 include_once '../models/Rol.php';
 
-class RolController {
+class RolControler {
     private $db;
     private $rol;
 

@@ -2,7 +2,7 @@
 include_once '../config/database.php';
 include_once '../models/Activities.php';
 
-class ActivitiesController {
+class ActivitiesControler {
     private $db;
     private $activities;
 

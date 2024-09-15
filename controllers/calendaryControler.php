@@ -2,7 +2,7 @@
 include_once '../config/database.php';
 include_once '../models/Calendary.php';
 
-class CalendaryController {
+class CalendaryControler {
     private $db;
     private $calendary;
 

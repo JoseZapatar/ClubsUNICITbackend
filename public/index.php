@@ -23,6 +23,7 @@ include_once '../controllers/announcementControler.php';
 include_once '../controllers/registrationControler.php';
 include_once '../controllers/activitiesControler.php';
 include_once '../controllers/calendaryControler.php';
+include_once '../controllers/authControler.php';
 
 // Obtenemos la URI y los datos del cuerpo de la solicitud
 $request = $_SERVER['REQUEST_URI'];
@@ -43,7 +44,7 @@ switch ($request) {
                 break;
             case 'DELETE':
                 if (!empty($data['IdUser'])) {
-                    $userController->deleteUser( $data['IdUser']);
+                    $userController->deleteUser($data['IdUser']);
                 } else {
                     echo json_encode(value: ["message" => "ID del usuario es necesario para eliminar."]);
                 }
@@ -54,8 +55,21 @@ switch ($request) {
                 break;
         }
         break;
+    case '/login':
+        $authController = new AuthControler();
+        switch ($_SERVER['REQUEST_METHOD']) {
+            case 'POST':
+                $authController->login($data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
 
-    case '/CLUBSUNICITBACKEND/public/index.php/rol':
+
+    case '/rol':
         $roleController = new RolControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':

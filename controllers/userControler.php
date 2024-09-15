@@ -23,7 +23,7 @@ class UserControler {
         echo json_encode($users);
     }
 
-    public function createUser(): void {
+    public function createUser($data): void {
         // Imprimir los datos recibidos para depuración
         echo "<pre>";
         print_r($_POST); // Para datos no binarios
@@ -64,7 +64,7 @@ class UserControler {
     
     
 
-    public function updateUser(): void {
+    public function updateUser($data): void {
         $data = json_decode(file_get_contents("php://input"), true);
         
         // Imprimir los datos recibidos para depuración
