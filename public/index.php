@@ -36,14 +36,14 @@ switch ($request) {
                 $userController->readUsers();
                 break;
             case 'POST':
-                $userController->createUser(data: $data);
+                $userController->createUser($data);
                 break;
             case 'PUT':
-                $userController->updateUser(data: $data);
+                $userController->updateUser($data);
                 break;
             case 'DELETE':
                 if (!empty($data['IdUser'])) {
-                    $userController->deleteUser(id: $data['IdUser']);
+                    $userController->deleteUser( $data['IdUser']);
                 } else {
                     echo json_encode(value: ["message" => "ID del usuario es necesario para eliminar."]);
                 }

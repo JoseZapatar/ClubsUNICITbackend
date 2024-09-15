@@ -1,10 +1,11 @@
 <?php
 include_once '../config/database.php';
 include_once '../models/User.php';
+
 // Habilitar CORS
-header(header: "Access-Control-Allow-Origin: *");
-header(header: "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header(header: "Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 class UserControler {
     private $db;
@@ -13,51 +14,84 @@ class UserControler {
     public function __construct() {
         $database = new Database();
         $this->db = $database->getConnection();
-        $this->user = new User(conn: $this->db);
+        $this->user = new User($this->db);
     }
 
     public function readUsers(): void {
         $stmt = $this->user->readUsers();
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(value: $users);
+        $users = $stmt;
+        echo json_encode($users);
     }
 
-    public function createUser($data): void {
-        $this->user->user = $data['User'];  
-        $this->user->password = $data['Password'];
-        $this->user->email = $data['Email'];
-        $this->user->picture = $data['Picture'];
-        $this->user->idRol = $data['IdRol'];
-
-        if($this->user->createUser()) {
-            echo json_encode(value: ["message" => "Usuario creado correctamente."]);
+    public function createUser(): void {
+        // Imprimir los datos recibidos para depuración
+        echo "<pre>";
+        print_r($_POST); // Para datos no binarios
+        echo "</pre>";
+        echo "<pre>";
+        print_r($_FILES); // Para archivos subidos
+        echo "</pre>";
+    
+        // Obtener datos del POST
+        $user = isset($_POST['user']) ? $_POST['user'] : null;
+        $password = isset($_POST['password']) ? $_POST['password'] : null;
+        $email = isset($_POST['email']) ? $_POST['email'] : null;
+        $idRol = isset($_POST['id']) ? $_POST['id'] : null;
+    
+        // Verificar si se ha subido un archivo
+        if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+            $photo = $_FILES['photo']['name']; // Nombre del archivo subido
+            // Mover el archivo a una carpeta específica si es necesario
+            move_uploaded_file($_FILES['photo']['tmp_name'], 'uploads/' . $_FILES['photo']['name']);
         } else {
-            echo json_encode(value: ["message" => "Error al crear usuario."]);
+            $photo = null; // O cualquier valor predeterminado si no se subió un archivo
+        }
+    
+        // Establecer valores en el modelo
+        $this->user->user = $user;
+        $this->user->password = $password;
+        $this->user->email = $email;
+        $this->user->picture = $photo; // Asignar el nombre del archivo
+        $this->user->idRol = $idRol;
+    
+        // Crear el usuario
+        if ($this->user->createUser()) {
+            echo json_encode(["message" => "Usuario creado correctamente."]);
+        } else {
+            echo json_encode(["message" => "Error al crear usuario."]);
         }
     }
+    
+    
 
-    public function updateUser($data): void {
-        $this->user->idUser = $data['IdUser'];  
-        $this->user->user = $data['User'];  
-        $this->user->password = $data['Password'];
-        $this->user->email = $data['Email'];
-        $this->user->picture = $data['Picture'];
-        $this->user->idRol = $data['IdRol'];
+    public function updateUser(): void {
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        // Imprimir los datos recibidos para depuración
+        error_log(print_r($data, true));
+        
+        $this->user->idUser = $data['IdUser'] ?? null;
+        $this->user->user = $data['User'] ?? null;
+        $this->user->password = $data['Password'] ?? null;
+        $this->user->email = $data['Email'] ?? null;
+        $this->user->picture = $data['Picture'] ?? null;
+        $this->user->idRol = $data['IdRol'] ?? null;
 
-        if($this->user->updateUser()) {
-            echo json_encode(value: ["message" => "Usuario actualizado correctamente."]);
+        if ($this->user->updateUser()) {
+            echo json_encode(["message" => "Usuario actualizado correctamente."]);
         } else {
-            echo json_encode(value: ["message" => "Error al actualizar usuario."]);
+            echo json_encode(["message" => "Error al actualizar usuario."]);
         }
     }
 
     public function deleteUser($id): void {
         $this->user->idUser = $id;
 
-        if($this->user->deleteUser()) {
-            echo json_encode(value: ["message" => "Usuario eliminado correctamente."]);
+        if ($this->user->deleteUser()) {
+            echo json_encode(["message" => "Usuario eliminado correctamente."]);
         } else {
-            echo json_encode(value: ["message" => "Error al eliminar usuario."]);
+            echo json_encode(["message" => "Error al eliminar usuario."]);
         }
     }
 }
+?>

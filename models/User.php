@@ -7,7 +7,6 @@ class User {
     public $email;
     public $picture;
     public $idRol;
-    
 
     public function __construct($conn) {
         $this->conn = $conn;
@@ -22,7 +21,7 @@ class User {
 
     public function createUser(): mixed {
         $sql = "INSERT INTO user (User, Password, Email, Picture, IdRol) 
-                VALUES (:user, :password, :description, :picture, :idRol)";
+                VALUES (:user, :password, :email, :picture, :idRol)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':user', $this->user);
         $stmt->bindParam(':password', $this->password);
@@ -30,6 +29,10 @@ class User {
         $stmt->bindParam(':picture', $this->picture);
         $stmt->bindParam(':idRol', $this->idRol);
         
+        // Verificar que la consulta está bien preparada
+        error_log("SQL Query: " . $stmt->queryString);
+        error_log("Parameters: User: $this->user, Password: $this->password, Email: $this->email, Picture: $this->picture, IdRol: $this->idRol");
+
         return $stmt->execute();
     }
 
@@ -43,6 +46,11 @@ class User {
         $stmt->bindParam(':picture', $this->picture);
         $stmt->bindParam(':idRol', $this->idRol);
         $stmt->bindParam(':idUser', $this->idUser, PDO::PARAM_INT);
+
+        // Verificar que la consulta está bien preparada
+        error_log("SQL Query: " . $stmt->queryString);
+        error_log("Parameters: User: $this->user, Password: $this->password, Email: $this->email, Picture: $this->picture, IdRol: $this->idRol, IdUser: $this->idUser");
+
         return $stmt->execute();
     }
 
@@ -50,6 +58,12 @@ class User {
         $sql = "DELETE FROM user WHERE IdUser = :idUser";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':idUser', $this->idUser, PDO::PARAM_INT);
+
+        // Verificar que la consulta está bien preparada
+        error_log("SQL Query: " . $stmt->queryString);
+        error_log("Parameters: IdUser: $this->idUser");
+
         return $stmt->execute();
     }
 }
+?>
