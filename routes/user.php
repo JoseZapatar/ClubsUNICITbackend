@@ -1,6 +1,6 @@
 <?php
 
-include_once '../controllers/userController.php';
+include_once '../controllers/userControler.php';
 
 $userController = new UserController();
 

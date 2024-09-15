@@ -38,7 +38,7 @@ switch ($request) {
         break;
 
     case '/role':
-        $roleController = new RolController();
+        $roleController = new RolControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 $roleController->readRoles();
@@ -64,7 +64,7 @@ switch ($request) {
         break;
 
     case '/club':
-        $clubController = new ClubController();
+        $clubController = new ClubControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 $clubController->readClubs();
@@ -90,7 +90,7 @@ switch ($request) {
         break;
 
     case '/announcement':
-        $announcementController = new AnnouncementController();
+        $announcementController = new AnnouncementControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 $announcementController->readAnnouncements();
@@ -116,7 +116,7 @@ switch ($request) {
         break;
 
     case '/registration':
-        $registrationController = new RegistrationController();
+        $registrationController = new RegistrationControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 $registrationController->readRegistrations();
@@ -142,7 +142,7 @@ switch ($request) {
         break;
 
     case '/activities':
-        $activitiesController = new ActivitiesController();
+        $activitiesController = new ActivitiesControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 $activitiesController->readActivities();
@@ -168,7 +168,7 @@ switch ($request) {
         break;
 
     case '/calendary':
-        $calendaryController = new CalendaryController();
+        $calendaryController = new CalendaryControler();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
                 $calendaryController->readCalendaries();

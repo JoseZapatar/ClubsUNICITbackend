@@ -17,7 +17,7 @@ class User {
         $sql = "SELECT * FROM user";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
-        return $stmt;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function createUser(): mixed {
