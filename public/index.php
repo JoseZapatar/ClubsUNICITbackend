@@ -57,18 +57,6 @@ switch ($request) {
                 break;
         }
         break;
-    case '/login':
-        $authController = new AuthControler();
-        switch ($_SERVER['REQUEST_METHOD']) {
-            case 'POST':
-                $authController->login($data);
-                break;
-            default:
-                http_response_code(405);
-                echo json_encode(["message" => "Método no permitido"]);
-                break;
-        }
-        break;
 
 
     case '/rol':
@@ -230,6 +218,19 @@ switch ($request) {
     default:
         http_response_code(response_code: 404);
         echo json_encode(value: ["message" => "Ruta no encontrada"]);
+        break;
+
+    case '/login':
+        $authController = new AuthControler();
+        switch ($_SERVER['REQUEST_METHOD']) {
+            case 'POST':
+                $authController->login($data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
         break;
 }
 ?>
