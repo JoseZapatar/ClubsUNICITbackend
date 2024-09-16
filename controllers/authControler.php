@@ -1,4 +1,5 @@
 <?php
+include_once '../config/database.php';
 class AuthControler {
     private $conn;
 
