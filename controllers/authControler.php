@@ -49,12 +49,14 @@ class AuthControler
                                 "idRol" => $user['IdRol']
                             ]
                         ]);
+                        exit(); // Terminar la ejecución aquí
                     } else {
                         // Si la contraseña no es válida
                         echo json_encode([
                             "success" => false,
                             "message" => "Contraseña incorrecta"
                         ]);
+                        exit(); // Terminar la ejecución aquí
                     }
                 } else {
                     // Si el usuario no existe
@@ -62,6 +64,7 @@ class AuthControler
                         "success" => false,
                         "message" => "Usuario no encontrado"
                     ]);
+                    exit(); // Terminar la ejecución aquí
                 }
             } catch (PDOException $e) {
                 // Manejar errores de base de datos
@@ -69,6 +72,7 @@ class AuthControler
                     "success" => false,
                     "message" => "Error en la consulta: " . $e->getMessage()
                 ]);
+                exit(); // Terminar la ejecución aquí
             }
         } else {
             // Si no se proporcionan el nombre de usuario o la contraseña
@@ -76,6 +80,7 @@ class AuthControler
                 "success" => false,
                 "message" => "Por favor, proporcione un nombre de usuario y una contraseña"
             ]);
+            exit(); // Terminar la ejecución aquí
         }
     }
 }
@@ -90,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Llamar al método login con los datos proporcionados
     $authController->login($data);
+    exit(); // Terminar la ejecución aquí para evitar cualquier otra salida
 } else {
     // Manejar error si no es una solicitud POST
     header("Content-Type: application/json; charset=UTF-8");
@@ -97,4 +103,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         "success" => false,
         "message" => "Método no permitido, utilice POST"
     ]);
+    exit(); // Terminar la ejecución aquí
 }
