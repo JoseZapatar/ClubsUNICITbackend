@@ -2,7 +2,7 @@
 
 include_once '../controllers/userControler.php';
 
-$userController = new UserController();
+$userController = new UserControler();
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = $_SERVER['REQUEST_URI'];
