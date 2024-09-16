@@ -59,7 +59,7 @@ class ClubControler{
         }
 
         // Establecer valores en el modelo
-        $this->club->ClubName = $ClubName;
+        $this->club->clubName = $ClubName;
         $this->club->description = $description;
         $this->club->coach = $coach;
         $this->club->idAnnouncement = $idAnnouncement;
