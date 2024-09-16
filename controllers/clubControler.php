@@ -25,7 +25,7 @@ class ClubControler{
         echo json_encode($clubs);
     }
 
-    public function createClub(): void
+    public function createClub($data): void
     {
         // Imprimir los datos recibidos para depuración
         echo "<pre>";
