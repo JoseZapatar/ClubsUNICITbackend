@@ -16,6 +16,16 @@ class AuthControler
     // Método para verificar el login
     public function login($data)
     {
+        // Verificar si los datos no están vacíos
+        if (empty($data)) {
+            header("Content-Type: application/json; charset=UTF-8");
+            echo json_encode([
+                "success" => false,
+                "message" => "No se enviaron datos"
+            ]);
+            exit();
+        }
+
         // Definir el encabezado de respuesta como JSON
         header("Content-Type: application/json; charset=UTF-8");
 
@@ -84,25 +94,4 @@ class AuthControler
             exit(); // Terminar la ejecución aquí
         }
     }
-}
-
-// Verificar si la solicitud es POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Crear instancia del controlador de autenticación
-    $authController = new AuthControler();
-
-    // Obtener los datos enviados en el cuerpo de la solicitud
-    $data = json_decode(file_get_contents("php://input"), true);
-
-    // Llamar al método login con los datos proporcionados
-    $authController->login($data);
-    exit(); // Terminar la ejecución aquí para evitar cualquier otra salida
-} else {
-    // Manejar error si no es una solicitud POST
-    header("Content-Type: application/json; charset=UTF-8");
-    echo json_encode([
-        "success" => false,
-        "message" => "Método no permitido, utilice POST"
-    ]);
-    exit(); // Terminar la ejecución aquí
 }
