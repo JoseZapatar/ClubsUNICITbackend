@@ -21,10 +21,13 @@ class ClubControler {
     public function createClub($data): void {
         $this->club->picture = $data['Picture'];
         $this->club->description = $data['Description'];
+        $this->club->banner = $data['Banner'];
+        $this->club->ClubName = $data['ClubName'];
+        $this->club->coach = $data['Coach'];
         $this->club->idAnnouncement = $data['IdAnnouncement'];
         $this->club->idActivities = $data['IdActivities'];
-        $this->club->banner = $data['Banner'];
-        $this->club->tutor = $data['Tutor'];
+        
+        
 
         if ($this->club->createClub()) {
             echo json_encode(value: ["message" => "Club creado correctamente."]);
@@ -37,10 +40,11 @@ class ClubControler {
         $this->club->idClub = $data['IdClub'];
         $this->club->picture = $data['Picture'];
         $this->club->description = $data['Description'];
+        $this->club->banner = $data['Banner'];
+        $this->club->ClubName = $data['ClubName'];
+        $this->club->coach = $data['Coach'];
         $this->club->idAnnouncement = $data['IdAnnouncement'];
         $this->club->idActivities = $data['IdActivities'];
-        $this->club->banner = $data['Banner'];
-        $this->club->tutor = $data['Tutor'];
 
         if ($this->club->updateClub()) {
             echo json_encode(value: ["message" => "Club actualizado correctamente."]);
