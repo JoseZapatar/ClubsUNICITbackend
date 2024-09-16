@@ -3,7 +3,7 @@
 include_once '../controllers/rolControler.php'; 
 
 
-$rolController = new RolController();
+$rolController = new RolControler();
 
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
