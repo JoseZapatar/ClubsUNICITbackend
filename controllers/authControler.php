@@ -54,7 +54,7 @@ class AuthControler
                         // Si la contraseña no es válida
                         echo json_encode([
                             "success" => false,
-                            "message" => "Contraseña incorrecta"
+                            "message" => "Contrasenia incorrecta"
                         ]);
                         exit(); // Terminar la ejecución aquí
                     }
