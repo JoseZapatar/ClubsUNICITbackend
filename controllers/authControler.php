@@ -83,7 +83,7 @@ class AuthControler
 // Verificar si la solicitud es POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Crear instancia del controlador de autenticación
-    $authController = new AuthController();
+    $authController = new AuthControler();
 
     // Obtener los datos enviados en el cuerpo de la solicitud
     $data = json_decode(file_get_contents("php://input"), true);
