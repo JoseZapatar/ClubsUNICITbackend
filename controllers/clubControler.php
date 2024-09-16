@@ -7,34 +7,23 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-class ClubControler{
+class ClubControler {
     private $db;
     private $club;
 
-    public function __construct()
-    {
+    public function __construct() {
         $database = new Database();
         $this->db = $database->getConnection();
         $this->club = new Club($this->db);
     }
 
-    public function readClubs(): void
-    {
+    public function readClubs(): void {
         $stmt = $this->club->readClubs();
         $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($clubs);
     }
 
-    public function createClub($data): void
-    {
-        // Imprimir los datos recibidos para depuración
-        echo "<pre>";
-        print_r($_POST); // Para datos no binarios
-        echo "</pre>";
-        echo "<pre>";
-        print_r($_FILES); // Para archivos subidos
-        echo "</pre>";
-
+    public function createClub($data): void {
         // Obtener datos del POST
         $ClubName = isset($_POST['ClubName']) ? $_POST['ClubName'] : null;
         $description = isset($_POST['description']) ? $_POST['description'] : null;
@@ -42,30 +31,12 @@ class ClubControler{
         $idAnnouncement = isset($_POST['idAnnouncement']) ? $_POST['idAnnouncement'] : null;
         $idActivities = isset($_POST['idActivities']) ? $_POST['idActivities'] : null;
 
-        // Verificar si se ha subido un archivo de imagen para el club
-        if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
-            $picture = $_FILES['picture']['name'];
-            move_uploaded_file($_FILES['picture']['tmp_name'], 'uploads/' . $_FILES['picture']['name']);
-        } else {
-            $picture = null;
-        }
-
-        // Verificar si se ha subido un banner para el club
-        if (isset($_FILES['banner']) && $_FILES['banner']['error'] === UPLOAD_ERR_OK) {
-            $banner = $_FILES['banner']['name'];
-            move_uploaded_file($_FILES['banner']['tmp_name'], 'uploads/' . $_FILES['banner']['name']);
-        } else {
-            $banner = null;
-        }
-
         // Establecer valores en el modelo
         $this->club->clubName = $ClubName;
         $this->club->description = $description;
         $this->club->coach = $coach;
         $this->club->idAnnouncement = $idAnnouncement;
         $this->club->idActivities = $idActivities;
-        $this->club->picture = $picture;
-        $this->club->banner = $banner;
 
         // Crear el club
         if ($this->club->createClub()) {
@@ -75,8 +46,7 @@ class ClubControler{
         }
     }
 
-    public function updateClub($data): void
-    {
+    public function updateClub($data): void {
         $data = json_decode(file_get_contents("php://input"), true);
 
         // Imprimir los datos recibidos para depuración
@@ -88,8 +58,6 @@ class ClubControler{
         $this->club->coach = $data['Coach'] ?? null;
         $this->club->idAnnouncement = $data['IdAnnouncement'] ?? null;
         $this->club->idActivities = $data['IdActivities'] ?? null;
-        $this->club->picture = $data['Picture'] ?? null;
-        $this->club->banner = $data['Banner'] ?? null;
 
         if ($this->club->updateClub()) {
             echo json_encode(["message" => "Club actualizado correctamente."]);
@@ -98,8 +66,7 @@ class ClubControler{
         }
     }
 
-    public function deleteClub($id): void
-    {
+    public function deleteClub($id): void {
         $this->club->idClub = $id;
 
         if ($this->club->deleteClub()) {
