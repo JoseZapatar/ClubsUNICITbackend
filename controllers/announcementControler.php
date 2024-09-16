@@ -18,15 +18,21 @@ class AnnouncementControler {
         echo json_encode(value: $announcements);
     }
 
-    public function createAnnouncement($data): void {
-        $this->announcement->description = $data['Description'];
-        $this->announcement->picture = $data['Picture'];
-        $this->announcement->name = $data['Name'];
-
-        if ($this->announcement->createAnnouncement()) {
-            echo json_encode(value: ["message" => "Anuncio creado correctamente."]);
+    public function createAnnouncement(): void {
+        $this->announcement->description = $_POST['description'] ?? '';
+        $this->announcement->name = $_POST['tituloAnuncio'] ?? '';
+    
+        // Manejo del archivo
+        if (isset($_FILES['picture'])) {
+            $this->announcement->picture = file_get_contents($_FILES['picture']['tmp_name']);
         } else {
-            echo json_encode(value: ["message" => "Error al crear anuncio."]);
+            $this->announcement->picture = null;
+        }
+    
+        if ($this->announcement->createAnnouncement()) {
+            echo json_encode(["message" => "Anuncio creado correctamente."]);
+        } else {
+            echo json_encode(["message" => "Error al crear anuncio."]);
         }
     }
 
