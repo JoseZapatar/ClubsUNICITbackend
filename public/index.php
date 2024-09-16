@@ -57,6 +57,7 @@ switch ($request) {
                 break;
         }
         break;
+    
     case '/login':
         $authController = new AuthControler();
         switch ($_SERVER['REQUEST_METHOD']) {
