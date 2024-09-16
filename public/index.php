@@ -1,9 +1,11 @@
 <?php
 // Habilitar CORS
-header('Access-Control-Allow-Origin: localhost:3000');
-header("Access-Control-Allow-Headers");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-header("Allow: GET, POST, OPTIONS, PUT, DELETE");
+// Habilitar CORS
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
+
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method == "OPTIONS") {
     die();
