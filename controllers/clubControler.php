@@ -25,16 +25,16 @@ class ClubControler {
 
     public function createClub($data): void {
         // Obtener datos del POST
-        $ClubName = isset($_POST['ClubName']) ? $_POST['ClubName'] : null;
-        $description = isset($_POST['description']) ? $_POST['description'] : null;
-        $coach = isset($_POST['coach']) ? $_POST['coach'] : null;
+        $clubName = isset($_POST['ClubName']) ? $_POST['ClubName'] : null;
+        $description = isset($_POST['Description']) ? $_POST['Description'] : null;
+        $coach = isset($_POST['Coach']) ? $_POST['Coach'] : null;
         $idAnnouncement = isset($_POST['idAnnouncement']) ? $_POST['idAnnouncement'] : null;
         $idActivities = isset($_POST['idActivities']) ? $_POST['idActivities'] : null;
-        $picture = isset($_POST['picture']) ? $_POST['picture'] : null;
-        $banner = isset($_POST['banner']) ? $_POST['banner'] : null;
-
+        $picture = isset($_FILES['picture']) ? $_FILES['picture']['name'] : null;
+        $banner = isset($_FILES['banner']) ? $_FILES['banner']['name'] : null;
+        
         // Establecer valores en el modelo
-        $this->club->clubName = $ClubName;
+        $this->club->clubName = $clubName;
         $this->club->description = $description;
         $this->club->coach = $coach;
         $this->club->idAnnouncement = $idAnnouncement;
@@ -48,6 +48,9 @@ class ClubControler {
         } else {
             echo json_encode(["message" => "Error al crear club."]);
         }
+        error_log(print_r($_POST, true));
+        error_log(print_r($_FILES, true));
+
     }
 
     public function updateClub($data): void {

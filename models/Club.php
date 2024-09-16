@@ -30,12 +30,13 @@ class Club {
         $stmt->bindParam(':picture', $this->picture);
         $stmt->bindParam(':description', $this->description);
         $stmt->bindParam(':banner', $this->banner);
-        $stmt->bindParam('clubName', $this->clubName);
+        $stmt->bindParam(':clubName', $this->clubName);
         $stmt->bindParam(':coach', $this->coach);
         $stmt->bindParam(':idAnnouncement', $this->idAnnouncement, PDO::PARAM_INT);
         $stmt->bindParam(':idActivities', $this->idActivities, PDO::PARAM_INT);
         return $stmt->execute();
-    }
+      }
+      
 
     public function updateClub(): mixed {
         $sql = "UPDATE club SET Picture = :picture, Description = :description, Banner = :banner, ClubName = :clubName, Coach = :coach, IdAnnouncement = :idAnnouncement, 
