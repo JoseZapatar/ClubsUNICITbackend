@@ -30,6 +30,8 @@ class ClubControler {
         $coach = isset($_POST['coach']) ? $_POST['coach'] : null;
         $idAnnouncement = isset($_POST['idAnnouncement']) ? $_POST['idAnnouncement'] : null;
         $idActivities = isset($_POST['idActivities']) ? $_POST['idActivities'] : null;
+        $picture = isset($_POST['picture']) ? $_POST['picture'] : null;
+        $banner = isset($_POST['banner']) ? $_POST['banner'] : null;
 
         // Establecer valores en el modelo
         $this->club->clubName = $ClubName;
@@ -37,6 +39,8 @@ class ClubControler {
         $this->club->coach = $coach;
         $this->club->idAnnouncement = $idAnnouncement;
         $this->club->idActivities = $idActivities;
+        $this->club->picture = $picture;
+        $this->club->banner = $banner;
 
         // Crear el club
         if ($this->club->createClub()) {
@@ -58,6 +62,8 @@ class ClubControler {
         $this->club->coach = $data['Coach'] ?? null;
         $this->club->idAnnouncement = $data['IdAnnouncement'] ?? null;
         $this->club->idActivities = $data['IdActivities'] ?? null;
+        $this->club->picture = $data['Picture'] ?? null;
+        $this->club->banner = $data['Banner'] ?? null;
 
         if ($this->club->updateClub()) {
             echo json_encode(["message" => "Club actualizado correctamente."]);
