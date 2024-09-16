@@ -36,7 +36,7 @@ switch ($request) {
                 break;
             case 'POST':
                 // Usamos $_POST y $_FILES para el caso de formularios con archivos
-                $userController->createUser($data);
+                $userController->createUser();
                 break;
             case 'PUT':
                 $userController->updateUser($data);
@@ -114,7 +114,7 @@ switch ($request) {
                 $announcementController->readAnnouncements();
                 break;
             case 'POST':
-                $announcementController->createAnnouncement($data);
+                $announcementController->createAnnouncement();
                 break;
             case 'PUT':
                 $announcementController->updateAnnouncement($data);
@@ -166,10 +166,10 @@ switch ($request) {
                 $activitiesController->readActivities();
                 break;
             case 'POST':
-                $activitiesController->createActivity($data);
+                $activitiesController->createActivity();
                 break;
             case 'PUT':
-                $activitiesController->updateActivity($data);
+                $activitiesController->updateActivity();
                 break;
             case 'DELETE':
                 if (!empty($data['IdActivities'])) {

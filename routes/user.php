@@ -24,7 +24,7 @@ switch (true) {
     
     case ($requestUri === '/user' && $requestMethod === 'POST'):
         $data = json_decode(json: file_get_contents(filename: 'php://input'), associative: true);
-        $userController->createUser(data: $data);
+        $userController->createUser();
         break;
 
     

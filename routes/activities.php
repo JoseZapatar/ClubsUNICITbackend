@@ -12,10 +12,10 @@ switch ($method) {
         $controller->readActivities();
         break;
     case 'POST':
-        $controller->createActivity(data: $data);
+        $controller->createActivity();
         break;
     case 'PUT':
-        $controller->updateActivity(data: $data);
+        $controller->updateActivity();
         break;
     case 'DELETE':
         $id = $_GET['id'] ?? null;

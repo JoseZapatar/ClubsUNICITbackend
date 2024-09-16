@@ -13,10 +13,10 @@ switch ($method) {
         $controller->readAnnouncements();
         break;
     case 'POST':
-        $controller->createAnnouncement(data: $data);
+        $controller->createAnnouncement();
         break;
     case 'PUT':
-        $controller->updateAnnouncement(data: $data);
+        $controller->updateAnnouncement($data);
         break;
     case 'DELETE':
         $id = $_GET['id'] ?? null;

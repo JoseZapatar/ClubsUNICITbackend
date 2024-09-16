@@ -23,7 +23,7 @@ class ClubControler {
         echo json_encode($clubs);
     }
 
-    public function createClub($data): void {
+    public function createClub(): void {
         // Obtener datos del POST
         $clubName = isset($_POST['ClubName']) ? $_POST['ClubName'] : null;
         $description = isset($_POST['Description']) ? $_POST['Description'] : null;
