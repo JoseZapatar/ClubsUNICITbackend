@@ -68,6 +68,7 @@ class AuthControler
                 }
             } catch (PDOException $e) {
                 // Manejar errores de base de datos
+                http_response_code(500);
                 echo json_encode([
                     "success" => false,
                     "message" => "Error en la consulta: " . $e->getMessage()
