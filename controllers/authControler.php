@@ -22,7 +22,7 @@ class AuthControler
         // Verificar que los campos User y Password estén presentes en los datos recibidos
         if (isset($data['User']) && isset($data['Password'])) {
             $username = $data['User'];
-            $password = $data['Password'];
+            $password = $data['Password'];  // Contraseña ingresada por el usuario (sin hash)
 
             try {
                 // Consulta SQL para buscar al usuario
@@ -37,9 +37,9 @@ class AuthControler
                 if ($stmt->rowCount() > 0) {
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Comparar la contraseña proporcionada con la almacenada
-                    if (password_verify($password, $user['Password'])) {
-                        // Si es válida, retornamos un mensaje de éxito y detalles del usuario
+                    // Comparar directamente la contraseña en texto plano
+                    if ($password === $user['Password']) {  // Comparación directa
+                        // Si la contraseña es correcta
                         echo json_encode([
                             "success" => true,
                             "message" => "Login exitoso",
@@ -51,7 +51,7 @@ class AuthControler
                         ]);
                         exit(); // Terminar la ejecución aquí
                     } else {
-                        // Si la contraseña no es válida
+                        // Si la contraseña no coincide
                         echo json_encode([
                             "success" => false,
                             "message" => "Contraseña incorrecta"
