@@ -15,11 +15,11 @@ switch ($method) {
         break;
     case 'POST':
         
-        $controller->createClub(data: $data);
+        $controller->createClub();
         break;
     case 'PUT':
        
-        $controller->updateClub(data: $data);
+        $controller->updateClub($data);
         break;
     case 'DELETE':
        

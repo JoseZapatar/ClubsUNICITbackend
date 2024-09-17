@@ -21,7 +21,7 @@ include_once '../controllers/registrationControler.php';
 include_once '../controllers/activitiesControler.php';
 include_once '../controllers/calendaryControler.php';
 include_once '../controllers/authControler.php';
-
+include_once '../controllers/userClubControler.php';
 // Obtenemos la URI y los datos del cuerpo de la solicitud
 $request = $_SERVER['REQUEST_URI'];
 $data = json_decode(file_get_contents("php://input"), true);
@@ -88,7 +88,7 @@ switch ($request) {
                 $clubController->readClubs();
                 break;
             case 'POST':
-                $clubController->createClub($data);
+                $clubController->createClub();
                 break;
             case 'PUT':
                 $clubController->updateClub($data);
@@ -216,6 +216,31 @@ switch ($request) {
         switch ($method) {
             case 'POST':
                 $authController->login($data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
+
+    case '/user-clubs':
+        $userClubController = new UserClubControler();
+        switch ($_SERVER['REQUEST_METHOD']) {
+            case 'GET':
+                $userClubController->getUserClubs();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
+    case '/user-club/register':
+        $userClubController = new UserClubControler();
+        switch ($_SERVER['REQUEST_METHOD']) {
+            case 'POST':
+                $userClubController->registerUserClub($data);
                 break;
             default:
                 http_response_code(405);
