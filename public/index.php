@@ -1,10 +1,18 @@
 <?php
+// archivo index.php o api.php
+
 // Habilitar CORS
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
 
+// Iniciar sesión
+
+// Definir el tipo de contenido como JSON
+header("Content-Type: application/json; charset=UTF-8");
+
+// Obtener el método de la solicitud
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Verificar si es una solicitud de OPTIONS y devolver una respuesta vacía
@@ -13,6 +21,7 @@ if ($method == "OPTIONS") {
     exit;
 }
 
+// Incluir controladores
 include_once '../controllers/userControler.php';
 include_once '../controllers/rolControler.php';
 include_once '../controllers/clubControler.php';
@@ -22,12 +31,14 @@ include_once '../controllers/activitiesControler.php';
 include_once '../controllers/calendaryControler.php';
 include_once '../controllers/authControler.php';
 include_once '../controllers/userClubControler.php';
+
 // Obtenemos la URI y los datos del cuerpo de la solicitud
 $request = $_SERVER['REQUEST_URI'];
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Cambiamos la estructura de las rutas
+// Rutas
 switch ($request) {
+    // Rutas para usuario
     case '/user':
         $userController = new UserControler();
         switch ($method) {
@@ -35,7 +46,6 @@ switch ($request) {
                 $userController->readUsers();
                 break;
             case 'POST':
-                // Usamos $_POST y $_FILES para el caso de formularios con archivos
                 $userController->createUser();
                 break;
             case 'PUT':
@@ -55,6 +65,7 @@ switch ($request) {
         }
         break;
 
+    // Rutas para roles
     case '/rol':
         $roleController = new RolControler();
         switch ($method) {
@@ -81,6 +92,7 @@ switch ($request) {
         }
         break;
 
+    // Rutas para clubs
     case '/club':
         $clubController = new ClubControler();
         switch ($method) {
@@ -107,6 +119,7 @@ switch ($request) {
         }
         break;
 
+    // Rutas para anuncios
     case '/announcement':
         $announcementController = new AnnouncementControler();
         switch ($method) {
@@ -133,6 +146,7 @@ switch ($request) {
         }
         break;
 
+    // Rutas para registros
     case '/registration':
         $registrationController = new RegistrationControler();
         switch ($method) {
@@ -159,6 +173,7 @@ switch ($request) {
         }
         break;
 
+    // Rutas para actividades
     case '/activities':
         $activitiesController = new ActivitiesControler();
         switch ($method) {
@@ -185,6 +200,7 @@ switch ($request) {
         }
         break;
 
+    // Rutas para calendarios
     case '/calendary':
         $calendaryController = new CalendaryControler();
         switch ($method) {
@@ -211,6 +227,7 @@ switch ($request) {
         }
         break;
 
+    // Ruta para login
     case '/login':
         $authController = new AuthControler();
         switch ($method) {
@@ -224,9 +241,35 @@ switch ($request) {
         }
         break;
 
+    // Ruta para verificar autenticación
+    case '/check-auth':
+        $authControler = new AuthControler();
+        switch ($method) {
+            case 'GET':
+                $authControler->checkAuth();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
+
+    // Ruta para logout
+    case '/logout':
+        $authController = new AuthControler();
+        if ($method === 'POST') {
+            $authController->logout();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Método no permitido"]);
+        }
+        break;
+
+    // Rutas para user-clubs
     case '/user-clubs':
         $userClubController = new UserClubControler();
-        switch ($_SERVER['REQUEST_METHOD']) {
+        switch ($method) {
             case 'GET':
                 $userClubController->getUserClubs();
                 break;
@@ -238,7 +281,7 @@ switch ($request) {
         break;
     case '/user-club/register':
         $userClubController = new UserClubControler();
-        switch ($_SERVER['REQUEST_METHOD']) {
+        switch ($method) {
             case 'POST':
                 $userClubController->registerUserClub($data);
                 break;
@@ -254,4 +297,3 @@ switch ($request) {
         echo json_encode(["message" => "Ruta no encontrada"]);
         break;
 }
-?>

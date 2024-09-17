@@ -10,27 +10,31 @@ class UserClubControler
     // Constructor que establece la conexión con la base de datos
     public function __construct()
     {
+        // Iniciar la sesión (deberías tener esto en algún archivo común o en todas las clases que lo necesiten)
+        session_start();
+
+        // Conectar a la base de datos
         $database = new Database();
         $this->conn = $database->getConnection();
     }
 
-    // Método para obtener los clubes de un usuario específico
+    // Método para obtener los clubes de un usuario específico (usando la sesión)
     public function getUserClubs()
     {
         // Verificar que el método sea GET
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            // Obtener los datos enviados en la solicitud
-            $data = json_decode(file_get_contents("php://input"), true);
 
-            // Verificar que se haya proporcionado el IdUser
-            if (isset($data['IdUser'])) {
-                $userId = $data['IdUser'];
+            // Verificar que haya una sesión activa y que IdUser esté disponible
+            if (isset($_SESSION['IdUser'])) {
+                $userId = $_SESSION['IdUser'];
+
 
                 try {
                     // Consulta SQL para obtener los clubes asociados al usuario
-                    $query = "SELECT club.* FROM club
+                    $query = "SELECT club.*
+                              FROM club
                               INNER JOIN user_club ON club.IdClub = user_club.IdClub
-                              WHERE user_club.IdUser = :userId";
+                              WHERE user_club.IdUser = $userId;";
 
                     $stmt = $this->conn->prepare($query);
                     $stmt->bindParam(':userId', $userId);
@@ -41,19 +45,15 @@ class UserClubControler
                     // Verificar si se encontraron resultados
                     if ($stmt->rowCount() > 0) {
                         $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                        // Retornar los clubes del usuario
-                        echo json_encode([
-                            "success" => true,
-                            "clubs" => $clubs
-                        ]);
                     } else {
-                        // Si no se encontraron clubes
-                        echo json_encode([
-                            "success" => false,
-                            "message" => "No se encontraron clubes para este usuario"
-                        ]);
+                        $clubs = []; // Asegúrate de devolver un array vacío si no hay resultados
                     }
+
+                    // Retornar los clubes del usuario
+                    echo json_encode([
+                        "success" => true,
+                        "clubs" => $clubs
+                    ]);
                 } catch (PDOException $e) {
                     // Manejar errores de base de datos
                     http_response_code(500);
@@ -63,10 +63,10 @@ class UserClubControler
                     ]);
                 }
             } else {
-                // Si no se proporciona el IdUser
+                // Si no se encuentra el IdUser en la sesión
                 echo json_encode([
                     "success" => false,
-                    "message" => "Por favor, proporcione el ID del usuario"
+                    "message" => "Usuario no autenticado"
                 ]);
             }
         } else {
@@ -78,13 +78,16 @@ class UserClubControler
             ]);
         }
     }
+
+
+    // Método para registrar al usuario en un club (usando la sesión)
     public function registerUserClub($data)
     {
         // Verificar que la solicitud sea POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Verificar que los campos IdUser y IdClub estén presentes
-            if (isset($data['IdUser']) && isset($data['IdClub'])) {
-                $userId = $data['IdUser'];
+            // Verificar que haya una sesión activa y que IdUser esté disponible
+            if (isset($_SESSION['IdUser']) && isset($data['IdClub'])) {
+                $userId = $_SESSION['IdUser'];
                 $clubId = $data['IdClub'];
 
                 // Instanciar el modelo de UserClub
@@ -111,5 +114,4 @@ class UserClubControler
             ]);
         }
     }
-
 }

@@ -65,5 +65,14 @@ class User {
 
         return $stmt->execute();
     }
+    
+    public function getUserByUsername($username): mixed {
+        $sql = "SELECT * FROM user WHERE User = :username";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
 }
 ?>

@@ -25,13 +25,6 @@ class UserControler {
 
     public function createUser(): void {
         // Imprimir los datos recibidos para depuración
-        echo "<pre>";
-        print_r($_POST); // Para datos no binarios
-        echo "</pre>";
-        echo "<pre>";
-        print_r($_FILES); // Para archivos subidos
-        echo "</pre>";
-    
         // Obtener datos del POST
         $user = isset($_POST['user']) ? $_POST['user'] : null;
         $password = isset($_POST['password']) ? $_POST['password'] : null;
@@ -46,7 +39,6 @@ class UserControler {
         } else {
             $photo = null; // O cualquier valor predeterminado si no se subió un archivo
         }
-    
         // Establecer valores en el modelo
         $this->user->user = $user;
         $this->user->password = $password;
@@ -58,8 +50,10 @@ class UserControler {
         if ($this->user->createUser()) {
             echo json_encode(["message" => "Usuario creado correctamente."]);
         } else {
+            error_log("Error al crear usuario: " . print_r($this->user, true));  // Log the error
             echo json_encode(["message" => "Error al crear usuario."]);
         }
+        
     }
     
     
@@ -93,5 +87,32 @@ class UserControler {
             echo json_encode(["message" => "Error al eliminar usuario."]);
         }
     }
+
+    public function getUserByUsername($username): void {
+        $stmt = $this->user->getUserByUsername($username);
+        $user = $stmt;
+        echo json_encode($user);
+    }
+    
+    
+
+    public function getUserInfo(): void {
+        // Verificar si el usuario está autenticado
+        if (!isset($_SESSION['authenticated']) || !$_SESSION['authenticated']) {
+            echo json_encode(['error' => 'No authenticated']);
+            exit();
+        }
+    
+        // Obtener la información del usuario
+        $username = $_SESSION['username'];
+        $user = $this->user->getUserByUsername($username); // Suponiendo que tienes este método en el modelo User
+    
+        if ($user) {
+            echo json_encode($user);
+        } else {
+            echo json_encode(['error' => 'User not found']);
+        }
+    }
+    
 }
 

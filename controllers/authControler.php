@@ -1,22 +1,25 @@
 <?php
-// Incluir la clase de conexión a la base de datos
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
+
 include_once '../config/database.php';
 
 class AuthControler
 {
+    
     private $conn;
 
-    // Constructor que establece la conexión con la base de datos
     public function __construct()
     {
         $database = new Database();
         $this->conn = $database->getConnection();
     }
 
-    // Método para verificar el login
     public function login($data)
     {
-        // Verificar si los datos no están vacíos
+        session_start();
         if (empty($data)) {
             header("Content-Type: application/json; charset=UTF-8");
             echo json_encode([
@@ -26,72 +29,122 @@ class AuthControler
             exit();
         }
 
-        // Definir el encabezado de respuesta como JSON
         header("Content-Type: application/json; charset=UTF-8");
 
-        // Verificar que los campos User y Password estén presentes en los datos recibidos
         if (isset($data['User']) && isset($data['Password'])) {
             $username = $data['User'];
-            $password = $data['Password'];  // Contraseña ingresada por el usuario (sin hash)
+            $password = $data['Password'];
 
             try {
-                // Consulta SQL para buscar al usuario
                 $query = "SELECT * FROM user WHERE User = :username";
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':username', $username);
-
-                // Ejecutar la consulta
                 $stmt->execute();
 
-                // Verificar si encontramos al usuario
                 if ($stmt->rowCount() > 0) {
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Comparar directamente la contraseña en texto plano
-                    if ($password === $user['Password']) {  // Comparación directa
-                        // Si la contraseña es correcta
+                    if ($password === $user['Password']) {
+                        $_SESSION['authenticated'] = true;
+                        $_SESSION['username'] = $user['User'];
+                        $_SESSION['email'] = $user['Email'];
+                        $_SESSION['idRol'] = $user['IdRol'];
+
                         echo json_encode([
                             "success" => true,
-                            "message" => "Login exitoso",
-                            "user" => [
-                                "username" => $user['User'],
-                                "email" => $user['Email'],
-                                "idRol" => $user['IdRol']
-                            ]
+                            "message" => "Login exitoso"
                         ]);
-                        exit(); // Terminar la ejecución aquí
+                        exit();
                     } else {
-                        // Si la contraseña no coincide
                         echo json_encode([
                             "success" => false,
-                            "message" => "Contrasenia incorrecta"
+                            "message" => "Contraseña incorrecta"
                         ]);
-                        exit(); // Terminar la ejecución aquí
+                        exit();
                     }
                 } else {
-                    // Si el usuario no existe
                     echo json_encode([
                         "success" => false,
                         "message" => "Usuario no encontrado"
                     ]);
-                    exit(); // Terminar la ejecución aquí
+                    exit();
                 }
             } catch (PDOException $e) {
-                // Manejar errores de base de datos
                 http_response_code(500);
                 echo json_encode([
                     "success" => false,
                     "message" => "Error en la consulta: " . $e->getMessage()
                 ]);
-                exit(); // Terminar la ejecución aquí
+                exit();
             }
         } else {
-            // Si no se proporcionan el nombre de usuario o la contraseña
             echo json_encode([
                 "success" => false,
                 "message" => "Por favor, proporcione un nombre de usuario y una contraseña"
             ]);
-            exit(); // Terminar la ejecución aquí
+            exit();
         }
+    }
+
+    public function checkAuth()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            
+            session_start();
+        }
+                
+        header("Content-Type: application/json; charset=UTF-8");
+
+        if (isset($_SESSION['authenticated']) && $_SESSION['authenticated']) {
+            $username = $_SESSION['username'];
+            $userData = $this->getUserData($username);
+
+            if ($userData) {
+                echo json_encode([
+                    "authenticated" => true,
+                    "username" => $userData['User'],
+                    "email" => $userData['Email'],
+                    "picture" => $userData['Picture']
+                ]);
+            } else {
+                echo json_encode([
+                    "authenticated" => false
+                ]);
+            }
+        } else {
+            echo json_encode([
+                "authenticated" => false
+            ]);
+        }
+        exit();
+    }
+
+    private function getUserData($username)
+    {
+        $query = "SELECT User, Email, Picture FROM user WHERE User = :username";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    public function logout()
+    {
+        session_start();
+        // Inicia sesión si no está iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            
+        }
+
+        // Cierra sesión
+        session_unset();
+        session_destroy();
+
+        header("Content-Type: application/json; charset=UTF-8");
+        echo json_encode([
+            "success" => true,
+            "message" => "Logout exitoso"
+        ]);
+        exit();
     }
 }
