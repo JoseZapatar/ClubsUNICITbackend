@@ -8,7 +8,7 @@ include_once '../config/database.php';
 
 class AuthControler
 {
-    
+
     private $conn;
 
     public function __construct()
@@ -19,7 +19,6 @@ class AuthControler
 
     public function login($data)
     {
-        session_start();
         if (empty($data)) {
             header("Content-Type: application/json; charset=UTF-8");
             echo json_encode([
@@ -28,8 +27,6 @@ class AuthControler
             ]);
             exit();
         }
-
-        header("Content-Type: application/json; charset=UTF-8");
 
         if (isset($data['User']) && isset($data['Password'])) {
             $username = $data['User'];
@@ -48,6 +45,7 @@ class AuthControler
                         $_SESSION['authenticated'] = true;
                         $_SESSION['username'] = $user['User'];
                         $_SESSION['email'] = $user['Email'];
+                        $_SESSION['IdUser'] = $user['IdUser']; // Asegúrate de que esto esté configurado
                         $_SESSION['idRol'] = $user['IdRol'];
 
                         echo json_encode([
@@ -86,13 +84,10 @@ class AuthControler
         }
     }
 
+
     public function checkAuth()
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            
-            session_start();
-        }
-                
+
         header("Content-Type: application/json; charset=UTF-8");
 
         if (isset($_SESSION['authenticated']) && $_SESSION['authenticated']) {
@@ -102,6 +97,7 @@ class AuthControler
             if ($userData) {
                 echo json_encode([
                     "authenticated" => true,
+                    'idclub' => $userData['IdUser'],
                     "username" => $userData['User'],
                     "email" => $userData['Email'],
                     "picture" => $userData['Picture']
@@ -121,7 +117,7 @@ class AuthControler
 
     private function getUserData($username)
     {
-        $query = "SELECT User, Email, Picture FROM user WHERE User = :username";
+        $query = "SELECT IdUser, User, Email, Picture FROM user WHERE User = :username";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':username', $username);
         $stmt->execute();
@@ -130,11 +126,6 @@ class AuthControler
     }
     public function logout()
     {
-        session_start();
-        // Inicia sesión si no está iniciada
-        if (session_status() === PHP_SESSION_NONE) {
-            
-        }
 
         // Cierra sesión
         session_unset();

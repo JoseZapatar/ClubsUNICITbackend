@@ -2,6 +2,8 @@
 // Incluir la clase de conexión a la base de datos
 include_once '../config/database.php';
 include_once '../models/UserClub.php';
+header("Content-Type: application/json; charset=UTF-8");
+
 
 class UserClubControler
 {
@@ -11,8 +13,10 @@ class UserClubControler
     public function __construct()
     {
         // Iniciar la sesión (deberías tener esto en algún archivo común o en todas las clases que lo necesiten)
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
 
+            session_start();
+        }
         // Conectar a la base de datos
         $database = new Database();
         $this->conn = $database->getConnection();
@@ -21,63 +25,52 @@ class UserClubControler
     // Método para obtener los clubes de un usuario específico (usando la sesión)
     public function getUserClubs()
     {
-        // Verificar que el método sea GET
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        session_start();
 
-            // Verificar que haya una sesión activa y que IdUser esté disponible
-            if (isset($_SESSION['IdUser'])) {
-                $userId = $_SESSION['IdUser'];
+        if (isset($_SESSION['IdUser'])) {
+            $userId = $_SESSION['IdUser'];
 
+            try {
+                $query = "SELECT club.* FROM club
+                  INNER JOIN user_club ON club.IdClub = user_club.IdClub
+                  WHERE user_club.IdUser = :userId";
 
-                try {
-                    // Consulta SQL para obtener los clubes asociados al usuario
-                    $query = "SELECT club.*
-                              FROM club
-                              INNER JOIN user_club ON club.IdClub = user_club.IdClub
-                              WHERE user_club.IdUser = $userId;";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':userId', $userId);
+                $stmt->execute();
 
-                    $stmt = $this->conn->prepare($query);
-                    $stmt->bindParam(':userId', $userId);
-
-                    // Ejecutar la consulta
-                    $stmt->execute();
-
-                    // Verificar si se encontraron resultados
-                    if ($stmt->rowCount() > 0) {
-                        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    } else {
-                        $clubs = []; // Asegúrate de devolver un array vacío si no hay resultados
-                    }
-
-                    // Retornar los clubes del usuario
+                if ($stmt->rowCount() > 0) {
+                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    header("Content-Type: application/json; charset=UTF-8"); // Establecer el tipo de contenido
                     echo json_encode([
                         "success" => true,
                         "clubs" => $clubs
                     ]);
-                } catch (PDOException $e) {
-                    // Manejar errores de base de datos
-                    http_response_code(500);
+                } else {
+                    header("Content-Type: application/json; charset=UTF-8"); // Establecer el tipo de contenido
                     echo json_encode([
                         "success" => false,
-                        "message" => "Error en la consulta: " . $e->getMessage()
+                        "message" => "No se encontraron clubes para este usuario"
                     ]);
                 }
-            } else {
-                // Si no se encuentra el IdUser en la sesión
+            } catch (PDOException $e) {
+                http_response_code(500);
+                header("Content-Type: application/json; charset=UTF-8"); // Establecer el tipo de contenido
                 echo json_encode([
                     "success" => false,
-                    "message" => "Usuario no autenticado"
+                    "message" => "Error en la consulta: " . $e->getMessage()
                 ]);
             }
         } else {
-            // Si el método no es GET
-            http_response_code(405);
+            header("Content-Type: application/json; charset=UTF-8"); // Establecer el tipo de contenido
             echo json_encode([
                 "success" => false,
-                "message" => "Método no permitido, utilice GET"
+                "message" => "Usuario no autenticado"
             ]);
         }
     }
+
+
 
 
     // Método para registrar al usuario en un club (usando la sesión)

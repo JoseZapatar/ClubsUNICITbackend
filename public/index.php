@@ -8,6 +8,8 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-W
 header("Access-Control-Allow-Credentials: true");
 
 // Iniciar sesión
+session_start();
+
 
 // Definir el tipo de contenido como JSON
 header("Content-Type: application/json; charset=UTF-8");
