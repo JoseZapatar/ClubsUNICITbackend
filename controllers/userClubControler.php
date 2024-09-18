@@ -2,6 +2,10 @@
 // Incluir la clase de conexión a la base de datos
 include_once '../config/database.php';
 include_once '../models/UserClub.php';
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 
 
@@ -25,10 +29,22 @@ class UserClubControler
     // Método para obtener los clubes de un usuario específico (usando la sesión)
     public function getUserClubs()
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
 
+            session_start();
+        }
         if (isset($_SESSION['IdUser'])) {
             $userId = $_SESSION['IdUser'];
+
+            echo json_encode([
+                "success" => true,
+                "user" => [
+                    "IdUser" => $userId,
+                    "username" => isset($_SESSION['username']) ? $_SESSION['username'] : null,
+                    "email" => isset($_SESSION['email']) ? $_SESSION['email'] : null,
+                    "idRol" => isset($_SESSION['idRol']) ? $_SESSION['idRol'] : null,
+                ]
+            ]);
 
             try {
                 $query = "SELECT club.* FROM club
@@ -62,10 +78,14 @@ class UserClubControler
                 ]);
             }
         } else {
-            header("Content-Type: application/json; charset=UTF-8"); // Establecer el tipo de contenido
+            header("Content-Type: application/json; charset=UTF-8");
+            
+ // Establecer el tipo de contenido
             echo json_encode([
                 "success" => false,
-                "message" => "Usuario no autenticado"
+                "message" => "Usuario no autenticado",
+                error_log('Session ID: ' . session_id()),
+                error_log('Session Data: ' . print_r($_SESSION, true))
             ]);
         }
     }

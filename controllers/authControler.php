@@ -87,17 +87,19 @@ class AuthControler
 
     public function checkAuth()
     {
-
         header("Content-Type: application/json; charset=UTF-8");
-
+    
+        // Mostrar el valor de la sesión para depuración
+        error_log(print_r($_SESSION, true)); // Esto lo registrará en el archivo de log del servidor
+    
         if (isset($_SESSION['authenticated']) && $_SESSION['authenticated']) {
             $username = $_SESSION['username'];
             $userData = $this->getUserData($username);
-
+    
             if ($userData) {
                 echo json_encode([
                     "authenticated" => true,
-                    'idclub' => $userData['IdUser'],
+                    'IdUser' => $userData['IdUser'],
                     "username" => $userData['User'],
                     "email" => $userData['Email'],
                     "picture" => $userData['Picture']
@@ -114,6 +116,7 @@ class AuthControler
         }
         exit();
     }
+    
 
     private function getUserData($username)
     {
