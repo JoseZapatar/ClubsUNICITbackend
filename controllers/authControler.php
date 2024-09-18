@@ -4,15 +4,19 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
 
+
 include_once '../config/database.php';
 
 class AuthControler
 {
-
     private $conn;
 
     public function __construct()
     {
+        // Iniciar la sesión si no se ha iniciado
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $database = new Database();
         $this->conn = $database->getConnection();
     }
@@ -45,7 +49,7 @@ class AuthControler
                         $_SESSION['authenticated'] = true;
                         $_SESSION['username'] = $user['User'];
                         $_SESSION['email'] = $user['Email'];
-                        $_SESSION['IdUser'] = $user['IdUser']; // Asegúrate de que esto esté configurado
+                        $_SESSION['IdUser'] = $user['IdUser'];
                         $_SESSION['idRol'] = $user['IdRol'];
 
                         echo json_encode([
@@ -84,18 +88,17 @@ class AuthControler
         }
     }
 
-
     public function checkAuth()
     {
         header("Content-Type: application/json; charset=UTF-8");
-    
+
         // Mostrar el valor de la sesión para depuración
-        error_log(print_r($_SESSION, true)); // Esto lo registrará en el archivo de log del servidor
-    
+        error_log('Session Data: ' . print_r($_SESSION, true));
+
         if (isset($_SESSION['authenticated']) && $_SESSION['authenticated']) {
             $username = $_SESSION['username'];
             $userData = $this->getUserData($username);
-    
+
             if ($userData) {
                 echo json_encode([
                     "authenticated" => true,
@@ -116,7 +119,6 @@ class AuthControler
         }
         exit();
     }
-    
 
     private function getUserData($username)
     {
@@ -127,9 +129,9 @@ class AuthControler
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
     public function logout()
     {
-
         // Cierra sesión
         session_unset();
         session_destroy();
