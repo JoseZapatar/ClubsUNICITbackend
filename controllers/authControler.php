@@ -135,12 +135,14 @@ class AuthControler
         // Cierra sesión
         session_unset();
         session_destroy();
-
+    
         header("Content-Type: application/json; charset=UTF-8");
+        http_response_code(200); // Opcional: establece el código de estado
         echo json_encode([
             "success" => true,
             "message" => "Logout exitoso"
         ]);
         exit();
     }
+    
 }

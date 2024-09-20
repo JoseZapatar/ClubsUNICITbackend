@@ -281,11 +281,25 @@ switch ($request) {
                 break;
         }
         break;
+
     case '/user-club/register':
         $userClubController = new UserClubControler();
         switch ($method) {
             case 'POST':
                 $userClubController->registerUserClub($data);
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
+
+    case '/posts':
+        $userClubController = new UserClubControler();
+        switch ($method) {
+            case 'GET':
+                $userClubController->getUserAnnouncements();
                 break;
             default:
                 http_response_code(405);
