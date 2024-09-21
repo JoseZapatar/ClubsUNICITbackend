@@ -307,6 +307,20 @@ switch ($request) {
                 break;
         }
         break;
+    // Nueva ruta para obtener los clubes y actividades del usuario
+    case '/user-clubs-activities':
+        $activitiesController = new ActivitiesControler();
+        switch ($method) {
+            case 'GET':
+                $activitiesController->getUserActivities();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
+
 
     default:
         http_response_code(404);

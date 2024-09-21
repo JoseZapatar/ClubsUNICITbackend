@@ -22,6 +22,7 @@ class ClubControler {
         $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($clubs);
     }
+    
 
     public function createClub(): void {
         // Obtener datos del POST
