@@ -105,11 +105,11 @@ switch ($request) {
                 $clubController->createClub();
                 break;
             case 'PUT':
-                $clubController->updateClub($data);
+                $clubController->updateClub();
                 break;
             case 'DELETE':
                 if (!empty($data['IdClub'])) {
-                    $clubController->deleteClub($data['IdClub']);
+                    $clubController->deleteClub();
                 } else {
                     echo json_encode(["message" => "ID del club es necesario para eliminar."]);
                 }

@@ -1,9 +1,9 @@
 <?php
 class Database {
     private $host = "sql3.freesqldatabase.com";
-    private $db_name = "sql3731406";
-    private $username = "sql3731406";
-    private $password = "CRe5asLEWP";
+    private $db_name = "sql3732711";
+    private $username = "sql3732711";
+    private $password = "v24vIxG2Z7";
     private $conn;
 
     // Conectar a la base de datos
