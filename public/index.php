@@ -51,7 +51,7 @@ switch ($request) {
                 $userController->createUser();
                 break;
             case 'PUT':
-                $userController->updateUser($data);
+                $userController->updateUser();
                 break;
             case 'DELETE':
                 if (!empty($data['IdUser'])) {
