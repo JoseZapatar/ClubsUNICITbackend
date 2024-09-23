@@ -10,7 +10,6 @@ header("Access-Control-Allow-Credentials: true");
 // Iniciar sesión
 session_start();
 
-
 // Definir el tipo de contenido como JSON
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -38,8 +37,11 @@ include_once '../controllers/userClubControler.php';
 $request = $_SERVER['REQUEST_URI'];
 $data = json_decode(file_get_contents("php://input"), true);
 
+// Extraer la ruta de la solicitud
+$requestPath = strtok($request, '?'); // Elimina los parámetros de consulta
+
 // Rutas
-switch ($request) {
+switch ($requestPath) {
     // Rutas para usuario
     case '/user':
         $userController = new UserControler();
@@ -113,6 +115,22 @@ switch ($request) {
                 } else {
                     echo json_encode(["message" => "ID del club es necesario para eliminar."]);
                 }
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
+
+    // Rutas para clubes
+    case '/club/search':
+        $clubController = new ClubControler();
+        switch ($method) {
+            case 'GET':
+                error_log("Término de búsqueda: " . (isset($_GET['term']) ? $_GET['term'] : 'no definido'));
+                $searchTerm = isset($_GET['term']) ? $_GET['term'] : '';
+                $clubController->searchClubs($searchTerm);
                 break;
             default:
                 http_response_code(405);
@@ -307,6 +325,7 @@ switch ($request) {
                 break;
         }
         break;
+
     // Nueva ruta para obtener los clubes y actividades del usuario
     case '/user-clubs-activities':
         $activitiesController = new ActivitiesControler();
@@ -321,8 +340,9 @@ switch ($request) {
         }
         break;
 
-
     default:
+        error_log("Ruta solicitada: " . $request);
+        var_dump("Ruta solicitada: " . $request); // Agrega esta línea para depuración
         http_response_code(404);
         echo json_encode(["message" => "Ruta no encontrada"]);
         break;

@@ -26,7 +26,31 @@ class ClubControler
         echo json_encode($clubs);
     }
 
-//Si
+    public function searchClubs($searchTerm): void
+    {
+        // Verifica si el término de búsqueda está vacío
+        if (empty($searchTerm)) {
+            // Si está vacío, no aplicar el filtro y buscar todos los clubes
+            $stmt = $this->club->searchClubs(''); // Pasar una cadena vacía o modificar el método en el modelo
+        } else {
+            // Filtrar el término de búsqueda
+            $searchTerm = '%' . $searchTerm . '%'; // Para usar en LIKE
+            $stmt = $this->club->searchClubs($searchTerm);
+        }
+
+        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($clubs) {
+            echo json_encode($clubs);
+        } else {
+            echo json_encode([]);
+        }
+    }
+
+
+
+
+    //Si
     public function createClub(): void
     {
         // Obtener datos del POST

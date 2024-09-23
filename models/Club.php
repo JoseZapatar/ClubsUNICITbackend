@@ -23,6 +23,24 @@ class Club {
         return $stmt;
     }
 
+    public function searchClubs($searchTerm): mixed {
+        if (empty($searchTerm)) {
+            // Si el término de búsqueda está vacío, obtener todos los clubes
+            $sql = "SELECT * FROM club";
+            $stmt = $this->conn->prepare($sql);
+        } else {
+            // Usar LIKE para buscar clubes que coincidan con el término
+            $searchTerm = '%' . $searchTerm . '%'; // Para usar en LIKE
+            $sql = "SELECT * FROM club WHERE ClubName LIKE :searchTerm";  
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':searchTerm', $searchTerm);
+        }
+        
+        $stmt->execute();
+        return $stmt;
+    }
+    
+
     public function createClub(): mixed {
         $sql = "INSERT INTO club (Picture, Description, Banner, ClubName, Coach, IdAnnouncement, IdActivities)  
                 VALUES (:picture, :description, :banner, :clubName, :coach, :idAnnouncement, :idActivities)";
