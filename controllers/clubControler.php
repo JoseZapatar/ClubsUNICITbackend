@@ -26,7 +26,7 @@ class ClubControler
         echo json_encode($clubs);
     }
 
-
+//Si
     public function createClub(): void
     {
         // Obtener datos del POST
