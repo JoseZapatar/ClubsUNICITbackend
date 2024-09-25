@@ -3,10 +3,10 @@ include_once '../config/database.php';
 include_once '../models/User.php';
 
 // Habilitar CORS
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
 class UserControler
 {
     private $db;
@@ -74,32 +74,34 @@ class UserControler
     }
     public function updateUser(): void
     {
-        // Leer datos crudos del cuerpo de la solicitud
-        $input = file_get_contents('php://input');
-        $data = json_decode($input, true);
+        // Verificar que la sesión tenga un ID de usuario
+        if (!isset($_SESSION["IdUser"])) {
+            echo json_encode(["error" => "Usuario no autenticado."]);
+            return;
+        }
 
-        // Depurar los datos recibidos
-        error_log("Datos recibidos para actualizar el usuario:");
-        error_log(print_r($data, true));
-
-        // Asignar valores desde el array $data
-        $idUser = isset($data['idUser']) ? $data['idUser'] : null;
-        $userName = isset($data['username']) ? $data['username'] : null;
-        $email = isset($data['email']) ? $data['email'] : null;
-        $password = isset($data['password']) ? $data['password'] : null;
+        // Capturar datos
+        $idUser = $_SESSION["IdUser"];
+        $userName = isset($_POST['username']) ? $_POST['username'] : null;
+        $email = isset($_POST['email']) ? $_POST['email'] : null;
+        $password = isset($_POST['password']) ? $_POST['password'] : null;
         $picture = isset($_FILES['profilePicture']) ? $_FILES['profilePicture'] : null;
 
         // Depurar los valores individuales
-        error_log("Valores después de la asignación:");
-        error_log("IdUser: " . $idUser);
-        error_log("User: " . $userName);
-        error_log("Email: " . $email);
-        error_log("Password: " . $password);
-        error_log("Picture: " . ($picture ? $picture['name'] : 'No hay imagen'));
+        error_log("ID de Usuario: $idUser");
+        error_log("Nombre de Usuario: $userName");
+        error_log("Email: $email");
+        error_log("Imagen: " . ($picture ? $picture['name'] : 'No hay imagen'));
 
         // Validar campos obligatorios
-        if (!$idUser || !$userName || !$email) {
-            echo json_encode(["error" => "Faltan datos obligatorios."]);
+        if (!$userName || !$email) {
+            echo json_encode([
+                "error" => "Faltan datos obligatorios",
+                "IdUser" => $idUser,
+                "User" => $userName,
+                "Email" => $email,
+                "Picture" => ($picture ? $picture['name'] : 'No hay imagen')
+            ]);
             return;
         }
 
@@ -108,35 +110,35 @@ class UserControler
         $this->user->user = $userName;
         $this->user->email = $email;
         $this->user->password = $password;
-        $this->user->picture = $picture ? $picture['name'] : null;
+
+        // Procesar la imagen
+        if ($picture) {
+            $uploadDir = 'uploads/'; // Ruta donde se guardarán las fotos
+            $uploadFilePath = $uploadDir . basename($picture['name']);
+
+            // Mover el archivo subido a la carpeta 'uploads/'
+            if (move_uploaded_file($picture['tmp_name'], $uploadFilePath)) {
+                // Guardar la ruta en el modelo
+                $this->user->picture = $uploadFilePath;
+            } else {
+                echo json_encode(["error" => "Error al mover el archivo."]);
+                return;
+            }
+        } else {
+            $this->user->picture = null; // No se actualiza si no se envió un nuevo archivo
+        }
 
         // Actualizar el usuario
         if ($this->user->updateUser()) {
-            echo json_encode(["message" => "Usuario actualizado correctamente."]);
+            echo json_encode([
+                "message" => "Usuario actualizado correctamente.",
+                "IdUser" => $idUser,
+                "User" => $userName,
+                "Email" => $email,
+                "Picture" => ($picture ? $picture['name'] : 'No hay imagen')
+            ]);
         } else {
             echo json_encode(["error" => "Error al actualizar usuario."]);
-        }
-    }
-
-    private function uploadImage($file)
-    {
-        $targetDir = "../uploads/";
-        $fileName = basename($file["name"]);
-        $targetFilePath = $targetDir . $fileName;
-        $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
-
-        // Validar el tipo de archivo
-        $validTypes = ['jpg', 'png', 'jpeg', 'gif'];
-        if (in_array($fileType, $validTypes)) {
-            if (move_uploaded_file($file["tmp_name"], $targetFilePath)) {
-                return $targetFilePath; // Retorna la ruta del archivo subido
-            } else {
-                error_log("Error subiendo el archivo.");
-                return null;
-            }
-        } else {
-            error_log("Tipo de archivo inválido.");
-            return null;
         }
     }
 

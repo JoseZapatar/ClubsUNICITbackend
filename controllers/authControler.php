@@ -94,6 +94,14 @@ class AuthControler
     {
         header("Content-Type: application/json; charset=UTF-8");
 
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            // Si es una solicitud OPTIONS, responde y termina aquí
+            header("Access-Control-Allow-Origin: http://localhost:3000");
+            header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+            header("Access-Control-Allow-Headers: Content-Type, Authorization");
+            exit(0);
+        }
+        
         // Mostrar el valor de la sesión para depuración
         error_log('Session Data: ' . print_r($_SESSION, true));
 

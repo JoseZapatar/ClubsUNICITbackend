@@ -1,3 +1,4 @@
+
 <?php
 // archivo index.php o api.php
 
@@ -122,6 +123,19 @@ switch ($requestPath) {
                 break;
         }
         break;
+
+        case '/edit-club':
+            $clubController = new ClubControler();
+            switch ($method) {
+                case 'POST':
+                    $clubController->updateClub();
+                    break;
+                default:
+                    http_response_code(405);
+                    echo json_encode(["message" => "Método no permitido"]);
+                    break;
+            }
+            break;
 
     // Rutas para clubes
     case '/club/search':
@@ -260,6 +274,19 @@ switch ($requestPath) {
                 break;
         }
         break;
+
+        case '/edit-user':
+            $userController = new UserControler();
+            switch ($method) {
+                case 'POST':
+                    $userController->updateUser();
+                    break;
+                default:
+                    http_response_code(405);
+                    echo json_encode(["message" => "Método no permitido"]);
+                    break;
+            }
+            break;
 
     // Ruta para verificar autenticación
     case '/check-auth':
