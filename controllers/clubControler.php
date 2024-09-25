@@ -3,7 +3,7 @@ include_once '../config/database.php';
 include_once '../models/Club.php';
 
 // Habilitar CORS
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: localhost:3000");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
@@ -20,11 +20,19 @@ class ClubControler
     }
 
     public function readClubs(): void
-    {
-        $stmt = $this->club->readClubs();
-        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($clubs);
+{
+    $stmt = $this->club->readClubs();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Modificar las rutas de las imágenes
+    foreach ($clubs as &$club) {
+        $club['picture'] = 'uploads/' . $club['Picture']; // Asumiendo que la columna en la base de datos se llama 'picture'
+        $club['banner'] = 'uploads/' . $club['Banner'];   // Asumiendo que la columna en la base de datos se llama 'banner'
     }
+
+    echo json_encode($clubs);
+}
+
 
     public function searchClubs($searchTerm): void
     {
@@ -48,36 +56,66 @@ class ClubControler
     }
 
 //Si
-    public function createClub(): void
-    {
-        // Obtener datos del POST
-        $clubName = isset($_POST['ClubName']) ? $_POST['ClubName'] : null;
-        $description = isset($_POST['Description']) ? $_POST['Description'] : null;
-        $coach = isset($_POST['Coach']) ? $_POST['Coach'] : null;
-        $idAnnouncement = isset($_POST['idAnnouncement']) ? $_POST['idAnnouncement'] : null;
-        $idActivities = isset($_POST['idActivities']) ? $_POST['idActivities'] : null;
-        $picture = isset($_FILES['picture']) ? $_FILES['picture']['name'] : null;
-        $banner = isset($_FILES['banner']) ? $_FILES['banner']['name'] : null;
+public function createClub(): void
+{
+    // Obtener datos del POST
+    $clubName = isset($_POST['ClubName']) ? $_POST['ClubName'] : null;
+    $description = isset($_POST['Description']) ? $_POST['Description'] : null;
+    $coach = isset($_POST['Coach']) ? $_POST['Coach'] : null;
+    $idAnnouncement = isset($_POST['idAnnouncement']) ? $_POST['idAnnouncement'] : null;
+    $idActivities = isset($_POST['idActivities']) ? $_POST['idActivities'] : null;
 
-        // Establecer valores en el modelo
-        $this->club->clubName = $clubName;
-        $this->club->description = $description;
-        $this->club->coach = $coach;
-        $this->club->idAnnouncement = $idAnnouncement;
-        $this->club->idActivities = $idActivities;
-        $this->club->picture = $picture;
-        $this->club->banner = $banner;
+    // Inicializar variables para las rutas de las imágenes
+    $picturePath = null;
+    $bannerPath = null;
 
-        // Crear el club
-        if ($this->club->createClub()) {
-            echo json_encode(["message" => "Club creado correctamente."]);
+    // Manejar la subida de imágenes
+    if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+        $pictureName = basename($_FILES['picture']['name']);
+        $targetPicturePath = 'uploads/' . $pictureName;
+
+        // Mover el archivo a la carpeta /uploads
+        if (move_uploaded_file($_FILES['picture']['tmp_name'], $targetPicturePath)) {
+            $picturePath = $pictureName;
         } else {
-            echo json_encode(["message" => "Error al crear club."]);
+            echo json_encode(["message" => "Error al subir la imagen del club."]);
+            return;
         }
-        error_log(print_r($_POST, true));
-        error_log(print_r($_FILES, true));
-
     }
+
+    if (isset($_FILES['banner']) && $_FILES['banner']['error'] === UPLOAD_ERR_OK) {
+        $bannerName = basename($_FILES['banner']['name']);
+        $targetBannerPath = 'uploads/' . $bannerName;
+
+        // Mover el archivo a la carpeta /uploads
+        if (move_uploaded_file($_FILES['banner']['tmp_name'], $targetBannerPath)) {
+            $bannerPath = $bannerName;
+        } else {
+            echo json_encode(["message" => "Error al subir el banner del club."]);
+            return;
+        }
+    }
+
+    // Establecer valores en el modelo
+    $this->club->clubName = $clubName;
+    $this->club->description = $description;
+    $this->club->coach = $coach;
+    $this->club->idAnnouncement = $idAnnouncement;
+    $this->club->idActivities = $idActivities;
+    $this->club->picture = $picturePath;
+    $this->club->banner = $bannerPath;
+
+    // Crear el club
+    if ($this->club->createClub()) {
+        echo json_encode(["message" => "Club creado correctamente."]);
+    } else {
+        echo json_encode(["message" => "Error al crear club."]);
+    }
+
+    error_log(print_r($_POST, true));
+    error_log(print_r($_FILES, true));
+}
+
 
     public function updateClub(): void
     {
