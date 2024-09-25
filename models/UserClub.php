@@ -15,24 +15,37 @@ class UserClub
 
     // Método para asociar un usuario con un club
     public function registerUserToClub($userId, $clubId)
-    {
-        try {
-            // Consulta SQL para insertar una nueva relación
-            $query = "INSERT INTO user_club (IdUser, IdClub) VALUES (:userId, :clubId)";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':userId', $userId);
-            $stmt->bindParam(':clubId', $clubId);
+{
+    try {
+        // Verificar si el usuario ya está registrado en el club
+        $checkQuery = "SELECT * FROM user_club WHERE IdUser = :userId AND IdClub = :clubId";
+        $stmt = $this->conn->prepare($checkQuery);
+        $stmt->bindParam(':userId', $userId);
+        $stmt->bindParam(':clubId', $clubId);
+        $stmt->execute();
 
-            // Ejecutar la consulta
-            if ($stmt->execute()) {
-                return ["success" => true, "message" => "Usuario registrado en el club exitosamente"];
-            } else {
-                return ["success" => false, "message" => "Error al registrar usuario en el club"];
-            }
-        } catch (PDOException $e) {
-            return ["success" => false, "message" => "Error en la consulta: " . $e->getMessage()];
+        // Si ya existe el registro, devolver un mensaje
+        if ($stmt->rowCount() > 0) {
+            return ["success" => false, "message" => "El usuario ya está registrado en este club."];
         }
+
+        // Si no está registrado, proceder con la inserción
+        $query = "INSERT INTO user_club (IdUser, IdClub) VALUES (:userId, :clubId)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':userId', $userId);
+        $stmt->bindParam(':clubId', $clubId);
+
+        // Ejecutar la consulta
+        if ($stmt->execute()) {
+            return ["success" => true, "message" => "Usuario registrado en el club exitosamente."];
+        } else {
+            return ["success" => false, "message" => "Error al registrar usuario en el club."];
+        }
+    } catch (PDOException $e) {
+        return ["success" => false, "message" => "Error en la consulta: " . $e->getMessage()];
     }
+}
+
 
     // Método para eliminar la relación entre un usuario y un club
     public function unregisterUserFromClub($userId, $clubId)

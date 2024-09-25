@@ -300,7 +300,7 @@ switch ($requestPath) {
         }
         break;
 
-    case '/user-club/register':
+    case '/join-club':
         $userClubController = new UserClubControler();
         switch ($method) {
             case 'POST':

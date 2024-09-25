@@ -70,28 +70,28 @@ class UserClubControler
     {
         if (isset($_SESSION['IdUser'])) {
             $userId = $_SESSION['IdUser'];
-    
+
             try {
                 $query = "SELECT announcement.Name, announcement.Description FROM announcement
                           RIGHT JOIN club ON club.IdAnnouncement = announcement.IdAnnouncement
                           RIGHT JOIN user_club ON club.IdClub = user_club.IdClub
                           WHERE user_club.IdUser = :userId";
-    
+
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':userId', $userId);
                 $this->conn->exec("SET NAMES 'utf8mb4'");
                 $stmt->execute();
-    
+
                 $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                
+
+
 
                 header("Content-Type: application/json; charset=UTF-8");
                 $json = json_encode([
                     "success" => true,
                     "announcements" => $announcements
                 ], JSON_UNESCAPED_UNICODE);
-                
+
                 if ($json === false) {
                     echo json_encode([
                         "success" => false,
@@ -115,16 +115,14 @@ class UserClubControler
             ]);
         }
     }
-    
+
 
 
 
     // Método para registrar al usuario en un club (usando la sesión)
     public function registerUserClub($data)
     {
-        // Verificar que la solicitud sea POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Verificar que haya una sesión activa y que IdUser esté disponible
             if (isset($_SESSION['IdUser']) && isset($data['IdClub'])) {
                 $userId = $_SESSION['IdUser'];
                 $clubId = $data['IdClub'];
@@ -139,18 +137,17 @@ class UserClubControler
                 header("Content-Type: application/json; charset=UTF-8");
                 echo json_encode($response);
             } else {
-                // Si faltan campos
                 echo json_encode([
                     "success" => false,
                     "message" => "IdUser e IdClub son obligatorios"
                 ]);
             }
         } else {
-            // Si no es una solicitud POST
             echo json_encode([
                 "success" => false,
                 "message" => "Método no permitido"
             ]);
         }
     }
+
 }
