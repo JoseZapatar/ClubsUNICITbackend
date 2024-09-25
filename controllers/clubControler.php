@@ -47,10 +47,7 @@ class ClubControler
         }
     }
 
-
-
-
-    //Si
+//Si
     public function createClub(): void
     {
         // Obtener datos del POST
@@ -130,9 +127,6 @@ class ClubControler
             echo json_encode(["message" => "Error al actualizar club."]);
         }
     }
-
-
-
 
 
     public function deleteClub(): void

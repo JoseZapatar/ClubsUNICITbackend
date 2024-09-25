@@ -51,6 +51,8 @@ class AuthControler
                         $_SESSION['email'] = $user['Email'];
                         $_SESSION['IdUser'] = $user['IdUser'];
                         $_SESSION['idRol'] = $user['IdRol'];
+                        $_SESSION['picture'] = $user['Picture'];
+                        
 
                         echo json_encode([
                             "success" => true,

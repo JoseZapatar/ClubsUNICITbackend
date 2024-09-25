@@ -28,40 +28,50 @@ class UserControler
 
     public function createUser(): void
     {
-        // Imprimir los datos recibidos para depuración
         // Obtener datos del POST
         $user = isset($_POST['user']) ? $_POST['user'] : null;
         $password = isset($_POST['password']) ? $_POST['password'] : null;
         $email = isset($_POST['email']) ? $_POST['email'] : null;
         $idRol = isset($_POST['id']) ? $_POST['id'] : null;
 
-        // Verificar si se ha subido un archivo
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-            $photo = $_FILES['photo']['name']; // Nombre del archivo subido
-            // Mover el archivo a una carpeta específica si es necesario
-            move_uploaded_file($_FILES['photo']['tmp_name'], 'uploads/' . $_FILES['photo']['name']);
-        } else {
-            $photo = null; // O cualquier valor predeterminado si no se subió un archivo
+        // Directorio donde se almacenarán las imágenes
+        $uploadDir = 'uploads/';
+
+        // Crear el directorio si no existe y establecer permisos
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
-        // Establecer valores en el modelo
+
+        // Verificar si se ha subido una imagen y moverla al directorio
+        if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+            $photoPath = $uploadDir . basename($_FILES['photo']['name']);
+            if (move_uploaded_file($_FILES['photo']['tmp_name'], $photoPath)) {
+                // Guardar la ruta de la imagen en el modelo
+                $this->user->picture = $photoPath;
+            } else {
+                // Si no se pudo mover el archivo, establecer picture como null
+                $this->user->picture = null;
+            }
+        } else {
+            // Si no se subió archivo, establecer picture como null
+            $this->user->picture = null;
+        }
+
+        // Asignar los demás valores al modelo
         $this->user->user = $user;
         $this->user->password = $password;
         $this->user->email = $email;
-        $this->user->picture = $photo; // Asignar el nombre del archivo
         $this->user->idRol = $idRol;
 
         // Crear el usuario
         if ($this->user->createUser()) {
             echo json_encode(["message" => "Usuario creado correctamente."]);
         } else {
-            error_log("Error al crear usuario: " . print_r($this->user, true));  // Log the error
+            // En caso de error, registrar en el log
+            error_log("Error al crear usuario: " . print_r($this->user, true));
             echo json_encode(["message" => "Error al crear usuario."]);
         }
-
     }
-
-
-
     public function updateUser(): void
     {
         // Leer datos crudos del cuerpo de la solicitud
@@ -108,10 +118,27 @@ class UserControler
         }
     }
 
+    private function uploadImage($file)
+    {
+        $targetDir = "../uploads/";
+        $fileName = basename($file["name"]);
+        $targetFilePath = $targetDir . $fileName;
+        $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
 
-
-
-
+        // Validar el tipo de archivo
+        $validTypes = ['jpg', 'png', 'jpeg', 'gif'];
+        if (in_array($fileType, $validTypes)) {
+            if (move_uploaded_file($file["tmp_name"], $targetFilePath)) {
+                return $targetFilePath; // Retorna la ruta del archivo subido
+            } else {
+                error_log("Error subiendo el archivo.");
+                return null;
+            }
+        } else {
+            error_log("Tipo de archivo inválido.");
+            return null;
+        }
+    }
 
 
     public function deleteUser($id): void
