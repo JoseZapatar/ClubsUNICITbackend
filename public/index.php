@@ -345,6 +345,7 @@ switch ($requestPath) {
         switch ($method) {
             case 'GET':
                 $userClubController->getUserAnnouncements();
+                // $userClubController->getAnnouncementsByClub();
                 break;
             default:
                 http_response_code(405);
@@ -353,6 +354,19 @@ switch ($requestPath) {
         }
         break;
 
+    
+    case '/club-announcements':
+        $userClubController = new UserClubControler();
+        switch ($method) {
+            case 'POST':
+                $userClubController->getAnnouncementsByClub();
+                break;
+            default:
+                http_response_code(405);
+                echo json_encode(["message" => "Método no permitido"]);
+                break;
+        }
+        break;
     // Nueva ruta para obtener los clubes y actividades del usuario
     case '/user-clubs-activities':
         $activitiesController = new ActivitiesControler();

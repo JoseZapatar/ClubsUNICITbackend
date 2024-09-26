@@ -115,7 +115,74 @@ class UserClubControler
             ]);
         }
     }
+    public function getAnnouncementsByClub()
+{
+    // Verificar que la solicitud sea POST
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Obtener el cuerpo de la solicitud
+        $data = json_decode(file_get_contents("php://input"), true);
 
+        // Verificar que el cuerpo contenga el clubId
+        if (isset($data['IdClub'])) {
+            $clubId = $data['IdClub'];
+
+            try {
+                // Consulta para obtener los anuncios de un club específico usando la tabla pivote club_announcement
+                $query = "SELECT announcement.Name, announcement.Description 
+                          FROM announcement
+                          INNER JOIN club_announcement ON announcement.IdAnnouncement = club_announcement.IdAnnouncement
+                          WHERE club_announcement.IdClub = :clubId";
+
+                // Preparar la consulta SQL
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':clubId', $clubId);
+                $this->conn->exec("SET NAMES 'utf8mb4'");
+                $stmt->execute();
+
+                // Obtener los resultados
+                $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Enviar la respuesta en formato JSON
+                header("Content-Type: application/json; charset=UTF-8");
+                $json = json_encode([
+                    "success" => true,
+                    "announcements" => $announcements
+                ], JSON_UNESCAPED_UNICODE);
+
+                if ($json === false) {
+                    echo json_encode([
+                        "success" => false,
+                        "message" => "Error al codificar JSON: " . json_last_error_msg()
+                    ]);
+                } else {
+                    echo $json;
+                }
+
+            } catch (PDOException $e) {
+                // Manejar errores de la base de datos
+                http_response_code(500);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Error en la consulta: " . $e->getMessage()
+                ]);
+            }
+        } else {
+            // Respuesta en caso de que no se haya enviado el IdClub
+            http_response_code(400);
+            echo json_encode([
+                "success" => false,
+                "message" => "Id del club no proporcionado"
+            ]);
+        }
+    } else {
+        // Respuesta si el método no es POST
+        http_response_code(405);
+        echo json_encode([
+            "success" => false,
+            "message" => "Método no permitido"
+        ]);
+    }
+}
 
 
 
