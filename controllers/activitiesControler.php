@@ -82,17 +82,6 @@ class ActivitiesControler
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
     public function createActivity(): void
     {
         // Obtener datos del POST

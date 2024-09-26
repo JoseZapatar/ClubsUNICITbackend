@@ -72,19 +72,20 @@ class UserClubControler
             $userId = $_SESSION['IdUser'];
 
             try {
-                $query = "SELECT announcement.Name, announcement.Description FROM announcement
-                          RIGHT JOIN club ON club.IdAnnouncement = announcement.IdAnnouncement
-                          RIGHT JOIN user_club ON club.IdClub = user_club.IdClub
-                          WHERE user_club.IdUser = :userId";
+                // Consulta actualizada para usar la tabla pivote club_announcement
+                $query = "SELECT a.Name, a.Description, a.Picture
+                      FROM announcement a
+                      INNER JOIN club_announcement ca ON a.IdAnnouncement = ca.IdAnnouncement
+                      INNER JOIN club c ON ca.IdClub = c.IdClub
+                      INNER JOIN user_club uc ON c.IdClub = uc.IdClub
+                      WHERE uc.IdUser = :userId";
 
                 $stmt = $this->conn->prepare($query);
-                $stmt->bindParam(':userId', $userId);
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);  // Asegurarse de que sea entero
                 $this->conn->exec("SET NAMES 'utf8mb4'");
                 $stmt->execute();
 
                 $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
 
                 header("Content-Type: application/json; charset=UTF-8");
                 $json = json_encode([
@@ -116,73 +117,73 @@ class UserClubControler
         }
     }
     public function getAnnouncementsByClub()
-{
-    // Verificar que la solicitud sea POST
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Obtener el cuerpo de la solicitud
-        $data = json_decode(file_get_contents("php://input"), true);
+    {
+        // Verificar que la solicitud sea POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Obtener el cuerpo de la solicitud
+            $data = json_decode(file_get_contents("php://input"), true);
 
-        // Verificar que el cuerpo contenga el clubId
-        if (isset($data['IdClub'])) {
-            $clubId = $data['IdClub'];
+            // Verificar que el cuerpo contenga el clubId
+            if (isset($data['IdClub'])) {
+                $clubId = $data['IdClub'];
 
-            try {
-                // Consulta para obtener los anuncios de un club específico usando la tabla pivote club_announcement
-                $query = "SELECT announcement.Name, announcement.Description 
+                try {
+                    // Consulta para obtener los anuncios de un club específico usando la tabla pivote club_announcement
+                    $query = "SELECT announcement.Name, announcement.Description, announcement.Picture
                           FROM announcement
                           INNER JOIN club_announcement ON announcement.IdAnnouncement = club_announcement.IdAnnouncement
                           WHERE club_announcement.IdClub = :clubId";
 
-                // Preparar la consulta SQL
-                $stmt = $this->conn->prepare($query);
-                $stmt->bindParam(':clubId', $clubId);
-                $this->conn->exec("SET NAMES 'utf8mb4'");
-                $stmt->execute();
+                    // Preparar la consulta SQL
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bindParam(':clubId', $clubId);
+                    $this->conn->exec("SET NAMES 'utf8mb4'");
+                    $stmt->execute();
 
-                // Obtener los resultados
-                $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    // Obtener los resultados
+                    $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // Enviar la respuesta en formato JSON
-                header("Content-Type: application/json; charset=UTF-8");
-                $json = json_encode([
-                    "success" => true,
-                    "announcements" => $announcements
-                ], JSON_UNESCAPED_UNICODE);
+                    // Enviar la respuesta en formato JSON
+                    header("Content-Type: application/json; charset=UTF-8");
+                    $json = json_encode([
+                        "success" => true,
+                        "announcements" => $announcements
+                    ], JSON_UNESCAPED_UNICODE);
 
-                if ($json === false) {
+                    if ($json === false) {
+                        echo json_encode([
+                            "success" => false,
+                            "message" => "Error al codificar JSON: " . json_last_error_msg()
+                        ]);
+                    } else {
+                        echo $json;
+                    }
+
+                } catch (PDOException $e) {
+                    // Manejar errores de la base de datos
+                    http_response_code(500);
                     echo json_encode([
                         "success" => false,
-                        "message" => "Error al codificar JSON: " . json_last_error_msg()
+                        "message" => "Error en la consulta: " . $e->getMessage()
                     ]);
-                } else {
-                    echo $json;
                 }
-
-            } catch (PDOException $e) {
-                // Manejar errores de la base de datos
-                http_response_code(500);
+            } else {
+                // Respuesta en caso de que no se haya enviado el IdClub
+                http_response_code(400);
                 echo json_encode([
                     "success" => false,
-                    "message" => "Error en la consulta: " . $e->getMessage()
+                    "message" => "Id del club no proporcionado"
                 ]);
             }
         } else {
-            // Respuesta en caso de que no se haya enviado el IdClub
-            http_response_code(400);
+            // Respuesta si el método no es POST
+            http_response_code(405);
             echo json_encode([
                 "success" => false,
-                "message" => "Id del club no proporcionado"
+                "message" => "Método no permitido"
             ]);
         }
-    } else {
-        // Respuesta si el método no es POST
-        http_response_code(405);
-        echo json_encode([
-            "success" => false,
-            "message" => "Método no permitido"
-        ]);
     }
-}
 
 
 

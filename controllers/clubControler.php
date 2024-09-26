@@ -56,7 +56,14 @@ class ClubControler
         }
     }
 
-    //Si
+    public function addUserToClub($idUser, $idClub)
+    {
+        $stmt = $this->db->prepare("INSERT INTO user_club (IdUser, IdClub) VALUES (:idUser, :idClub)");
+        $stmt->bindParam(':idUser', $idUser);
+        $stmt->bindParam(':idClub', $idClub);
+        return $stmt->execute();
+    }
+
     public function createClub(): void
     {
         // Obtener datos del POST
@@ -65,11 +72,9 @@ class ClubControler
         $coach = isset($_POST['Coach']) ? $_POST['Coach'] : null;
         $idAnnouncement = isset($_POST['idAnnouncement']) ? $_POST['idAnnouncement'] : null;
         $idActivities = isset($_POST['idActivities']) ? $_POST['idActivities'] : null;
-
         // Inicializar variables para las rutas de las imágenes
         $picturePath = null;
         $bannerPath = null;
-
         // Manejar la subida de imágenes
         if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
             $pictureName = basename($_FILES['picture']['name']);
@@ -83,7 +88,6 @@ class ClubControler
                 return;
             }
         }
-
         if (isset($_FILES['banner']) && $_FILES['banner']['error'] === UPLOAD_ERR_OK) {
             $bannerName = basename($_FILES['banner']['name']);
             $targetBannerPath = 'uploads/' . $bannerName;
@@ -96,7 +100,6 @@ class ClubControler
                 return;
             }
         }
-
         // Establecer valores en el modelo
         $this->club->clubName = $clubName;
         $this->club->description = $description;
@@ -105,10 +108,26 @@ class ClubControler
         $this->club->idActivities = $idActivities;
         $this->club->picture = $picturePath;
         $this->club->banner = $bannerPath;
-
         // Crear el club
         if ($this->club->createClub()) {
-            echo json_encode(["message" => "Club creado correctamente."]);
+            // Obtener el IdUser de la sesión
+            if (!isset($_SESSION['IdUser'])) {
+                echo json_encode(["message" => "Usuario no autenticado."]);
+                return;
+            }
+
+            $idUser = $_SESSION['IdUser']; // Ahora puedes obtener el IdUser
+
+
+            // Obtener el IdClub del último club creado
+            $idClub = $this->db->lastInsertId(); // Asegúrate de tener este método en tu modelo
+
+            // Insertar en la tabla pivote user_club
+            if ($this->addUserToClub($idUser, $idClub)) {
+                echo json_encode(["message" => "Club creado correctamente y asignado al usuario."]);
+            } else {
+                echo json_encode(["message" => "Club creado, pero no se pudo asignar al usuario."]);
+            }
         } else {
             echo json_encode(["message" => "Error al crear club."]);
         }
@@ -117,59 +136,68 @@ class ClubControler
         error_log(print_r($_FILES, true));
     }
 
-
     public function updateClub(): void
     {
-        // Leer datos desde POST y FILES
-        $idClub = isset($_POST['idClub']) ? $_POST['idClub'] : null;
-        $clubName = isset($_POST['clubName']) ? $_POST['clubName'] : null;
-        $description = isset($_POST['description']) ? $_POST['description'] : null;
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        header('Content-Type: application/json');
+        // Leer datos desde POST
+        $idClub = $_POST['idClub'] ?? null;
+        $clubName = isset($_POST['clubName']) ? $_POST['clubName']: null;
+        $description =  isset($_POST['description']) ?$_POST['description'] : null;
         $coach = isset($_POST['coach']) ? $_POST['coach'] : null;
-        $idAnnouncement = isset($_POST['idAnnouncement']) ? $_POST['idAnnouncement'] : null;
-        $idActivities = isset($_POST['idActivities']) ? $_POST['idActivities'] : null;
+        $picture = isset($_FILES['picture']) ? $_FILES['picture']:null;
+        $banner =isset($_FILES['banner']) ? $_FILES['banner']:null;
+        $announcement = null; 
+        $idActivities = null;
+        $picturePath = null;
+        $bannerPath = null;
+        // Manejar la subida de imágenes
+        if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+            $pictureName = basename($_FILES['picture']['name']);
+            $targetPicturePath = 'uploads/' . $pictureName;
 
-        // Manejar archivos
-        $picture = isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK ? $_FILES['picture'] : null;
-        $banner = isset($_FILES['banner']) && $_FILES['banner']['error'] === UPLOAD_ERR_OK ? $_FILES['banner'] : null;
+            // Mover el archivo a la carpeta /uploads
+            if (move_uploaded_file($_FILES['picture']['tmp_name'], $targetPicturePath)) {
+                $picturePath = $pictureName;
+            } else {
+                echo json_encode(["message" => "Error al subir la imagen del club."]);
+                return;
+            }
+        }
+        if (isset($_FILES['banner']) && $_FILES['banner']['error'] === UPLOAD_ERR_OK) {
+            $bannerName = basename($_FILES['banner']['name']);
+            $targetBannerPath = 'uploads/' . $bannerName;
 
-        // Establecer valores en el modelo
+            // Mover el archivo a la carpeta /uploads
+            if (move_uploaded_file($_FILES['banner']['tmp_name'], $targetBannerPath)) {
+                $bannerPath = $bannerName;
+            } else {
+                echo json_encode(["message" => "Error al subir el banner del club."]);
+                return;
+            }
+        }  
+
         $this->club->idClub = $idClub;
         $this->club->clubName = $clubName;
         $this->club->description = $description;
         $this->club->coach = $coach;
-        $this->club->idAnnouncement = $idAnnouncement;
+        $this->club->idAnnouncement = $announcement;
         $this->club->idActivities = $idActivities;
+        $this->club->picture = $picturePath;
+        $this->club->banner = $bannerPath;
 
-        // Manejar la carga de archivos
-        if ($picture) {
-            $picturePath = 'uploads/' . basename($picture['name']);
-            if (move_uploaded_file($picture['tmp_name'], $picturePath)) {
-                $this->club->picture = $picturePath;
-            } else {
-                error_log("Error al mover la imagen de perfil.");
-            }
-        }
-
-        if ($banner) {
-            $bannerPath = 'uploads/' . basename($banner['name']);
-            if (move_uploaded_file($banner['tmp_name'], $bannerPath)) {
-                $this->club->banner = $bannerPath;
-            } else {
-                error_log("Error al mover el banner.");
-            }
-        }
-
+       
         // Actualizar el club
-        if ($this->club->updateClub()) {
-            echo json_encode(["message" => "Club actualizado correctamente.",  "Files" => $_FILES
-            
-            ]);
-        } else {
-            echo json_encode(["message" => "Error al actualizar club."]);
-        }
+        if ($this->club->updateClub()){
+            echo json_encode(['succes' => "club creado exitosamente"
+        ]);
+        
+        }else {
+            echo json_encode(["error" => "Error al actualizar club."]);
+
+        }        
     }
-
-
 
 
     public function deleteClub(): void

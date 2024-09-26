@@ -56,7 +56,7 @@ class Club {
       }
       
 
-      public function updateClub() {
+      public function updateClub():mixed {
         $query = "UPDATE club 
                   SET ClubName = :clubName, Description = :description, Coach = :coach, IdAnnouncement = :idAnnouncement, 
                       IdActivities = :idActivities, Picture = :picture, Banner = :banner 
@@ -70,11 +70,9 @@ class Club {
         $stmt->bindParam(':coach', $this->coach);
         $stmt->bindParam(':idAnnouncement', $this->idAnnouncement);
         $stmt->bindParam(':idActivities', $this->idActivities);
-    
         // Manejar null en picture y banner
         $stmt->bindValue(':picture', $this->picture !== null ? $this->picture : null, PDO::PARAM_LOB);
         $stmt->bindValue(':banner', $this->banner !== null ? $this->banner : null, PDO::PARAM_LOB);
-        
         $stmt->bindParam(':idClub', $this->idClub);
     
         if ($stmt->execute()) {
